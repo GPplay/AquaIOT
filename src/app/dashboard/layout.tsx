@@ -26,32 +26,40 @@ export default function DashboardLayout({
         <SidebarContent>
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton href="/dashboard" isActive={pathname === '/dashboard'} tooltip="Dashboard">
-                <LayoutDashboard />
-                Dashboard
-              </SidebarMenuButton>
+              <Link href="/dashboard" passHref legacyBehavior>
+                <SidebarMenuButton as="a" isActive={pathname === '/dashboard'} tooltip="Dashboard">
+                  <LayoutDashboard />
+                  Dashboard
+                </SidebarMenuButton>
+              </Link>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton href="/dashboard/sensors" isActive={pathname === '/dashboard/sensors'} tooltip="Sensors">
-                <Droplet />
-                Sensors
-              </SidebarMenuButton>
+              <Link href="/dashboard/sensors" passHref legacyBehavior>
+                <SidebarMenuButton as="a" isActive={pathname === '/dashboard/sensors'} tooltip="Sensors">
+                  <Droplet />
+                  Sensors
+                </SidebarMenuButton>
+              </Link>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton href="#" tooltip="Alerts">
-                <Bell />
-                Alerts
-              </SidebarMenuButton>
+               <Link href="#" passHref legacyBehavior>
+                <SidebarMenuButton as="a" tooltip="Alerts">
+                  <Bell />
+                  Alerts
+                </SidebarMenuButton>
+              </Link>
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarContent>
         <SidebarFooter>
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton href="#" tooltip="Settings">
-                <Settings />
-                Settings
-              </SidebarMenuButton>
+              <Link href="#" passHref legacyBehavior>
+                <SidebarMenuButton as="a" tooltip="Settings">
+                  <Settings />
+                  Settings
+                </SidebarMenuButton>
+              </Link>
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarFooter>
