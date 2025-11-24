@@ -1,0 +1,49 @@
+'use client';
+
+import { Bar, BarChart, CartesianGrid, ResponsiveContainer, XAxis, YAxis } from 'recharts';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
+
+const chartData = [
+  { time: '6h ago', level: 1.8 },
+  { time: '5h ago', level: 1.9 },
+  { time: '4h ago', level: 2.1 },
+  { time: '3h ago', level: 2.2 },
+  { time: '2h ago', level: 2.4 },
+  { time: '1h ago', level: 2.3 },
+  { time: 'Now', level: 2.5 },
+];
+
+const chartConfig = {
+    level: {
+        label: 'Water Level',
+        color: 'hsl(var(--primary))',
+    },
+};
+
+export function WaterLevelChart() {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Water Level Trend</CardTitle>
+        <CardDescription>Water level over the last 6 hours</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <ChartContainer config={chartConfig} className="h-[250px] w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={chartData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} />
+              <XAxis dataKey="time" tickLine={false} axisLine={false} tickMargin={8} fontSize={12} />
+              <YAxis unit="m" tickLine={false} axisLine={false} tickMargin={8} fontSize={12} />
+              <ChartTooltip
+                cursor={false}
+                content={<ChartTooltipContent indicator="dot" />}
+              />
+              <Bar dataKey="level" fill="hsl(var(--chart-1))" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </ChartContainer>
+      </CardContent>
+    </Card>
+  );
+}
