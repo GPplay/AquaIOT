@@ -1,14 +1,19 @@
+'use client';
+
 import { SidebarProvider, Sidebar, SidebarInset, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarFooter } from "@/components/ui/sidebar";
 import { LayoutDashboard, Droplet, Settings, Bell } from "lucide-react";
 import Logo from "@/components/logo";
 import { Header } from "@/components/header";
 import Link from "next/link";
+import { usePathname } from 'next/navigation';
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const pathname = usePathname();
+
   return (
     <SidebarProvider>
       <Sidebar>
@@ -21,13 +26,13 @@ export default function DashboardLayout({
         <SidebarContent>
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton href="/dashboard" isActive={true} tooltip="Dashboard">
+              <SidebarMenuButton href="/dashboard" isActive={pathname === '/dashboard'} tooltip="Dashboard">
                 <LayoutDashboard />
                 Dashboard
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton href="#" tooltip="Sensors">
+              <SidebarMenuButton href="/dashboard/sensors" isActive={pathname === '/dashboard/sensors'} tooltip="Sensors">
                 <Droplet />
                 Sensors
               </SidebarMenuButton>
