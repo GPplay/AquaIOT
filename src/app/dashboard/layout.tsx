@@ -42,8 +42,8 @@ export default function DashboardLayout({
               </Link>
             </SidebarMenuItem>
             <SidebarMenuItem>
-               <Link href="#" passHref legacyBehavior>
-                <SidebarMenuButton as="a" tooltip="Alerts">
+               <Link href="/dashboard/alerts" passHref legacyBehavior>
+                <SidebarMenuButton as="a" isActive={pathname === '/dashboard/alerts'} tooltip="Alerts">
                   <Bell />
                   Alerts
                 </SidebarMenuButton>
