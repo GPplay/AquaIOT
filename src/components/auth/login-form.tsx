@@ -9,6 +9,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { useState } from 'react';
 import { Loader2 } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 const formSchema = z.object({
   email: z.string().email('Invalid email address.'),
@@ -18,6 +19,7 @@ const formSchema = z.object({
 export function LoginForm() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -39,15 +41,20 @@ export function LoginForm() {
       });
 
       if (!response.ok) {
-        throw new Error("Login failed");
+        const errorData = await response.json();
+        throw new Error(errorData.message || `Error ${response.status}: Login failed`);
       }
 
       // Handle successful login
       router.push('/dashboard');
 
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      // Handle error (e.g., show a toast notification)
+      toast({
+        variant: "destructive",
+        title: "Login Failed",
+        description: error.message,
+      })
     } finally {
       setLoading(false);
     }

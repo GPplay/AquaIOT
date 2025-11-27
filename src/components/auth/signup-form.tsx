@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import { useToast } from '@/hooks/use-toast';
 
 const formSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters.'),
@@ -26,6 +27,7 @@ const formSchema = z.object({
 export function SignupForm() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -47,15 +49,20 @@ export function SignupForm() {
       });
 
       if (!response.ok) {
-        throw new Error("Registration failed");
+        const errorData = await response.json();
+        throw new Error(errorData.message || `Error ${response.status}: Registration failed`);
       }
 
       // Handle successful registration
       router.push('/dashboard');
 
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      // Handle error (e.g., show a toast notification)
+      toast({
+        variant: "destructive",
+        title: "Registration Failed",
+        description: error.message,
+      });
     } finally {
       setLoading(false);
     }
