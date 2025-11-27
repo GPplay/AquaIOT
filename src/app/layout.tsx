@@ -5,6 +5,9 @@ import { Toaster } from '@/components/ui/toaster';
 export const metadata: Metadata = {
   title: 'AquaGuard',
   description: 'Sistema de Alerta Temprana de Inundaciones',
+  icons: {
+    icon: '/logo.png',
+  },
 };
 
 export default function RootLayout({
