@@ -29,21 +29,9 @@ export function LoginForm() {
     // Simulate API call
     setTimeout(() => {
       // In a real app, you would handle authentication here
-      console.log(values.email, values.password);
-
-      fetch("http://localhost:9001/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(values),
-      })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log("Success:", data);
-        router.push('/dashboard');
-      });
-
+      console.log('Login attempt with:', values.email);
+      // For now, we'll just navigate to the dashboard
+      router.push('/dashboard');
     }, 1000);
   }
 
