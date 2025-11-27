@@ -6,7 +6,13 @@ export const metadata: Metadata = {
   title: 'AquaGuard',
   description: 'Sistema de Alerta Temprana de Inundaciones',
   icons: {
-    icon: "/logo.png?v=1",
+    icon: [
+      { url: '/logo.png', type: 'image/png' },
+    ],
+    shortcut: ['/logo.png'],
+    apple: [
+      { url: '/logo.png', sizes: '180x180' },
+    ],
   },
 };
 
