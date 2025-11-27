@@ -2,7 +2,7 @@
 
 import { SidebarProvider, Sidebar, SidebarInset, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarFooter } from "@/components/ui/sidebar";
 import { LayoutDashboard, Droplet, Settings, Bell } from "lucide-react";
-import Logo from "@/components/logo";
+import Image from "next/image";
 import { Header } from "@/components/header";
 import Link from "next/link";
 import { usePathname } from 'next/navigation';
@@ -21,7 +21,7 @@ export default function DashboardLayout({
       <Sidebar>
         <SidebarHeader>
           <Link href="/dashboard" className="flex items-center gap-2">
-            <Logo />
+            <Image src="/logo.png" alt="AquaGuard Logo" width={48} height={48} />
             <h1 className="font-headline text-xl font-semibold text-primary">AquaGuard</h1>
           </Link>
         </SidebarHeader>

@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { LoginForm } from '@/components/auth/login-form';
-import Logo from '@/components/logo';
+import Image from 'next/image';
 
 export default function LoginPage() {
   return (
@@ -9,7 +9,7 @@ export default function LoginPage() {
       <Card className="w-full max-w-md mx-auto shadow-2xl">
         <CardHeader className="text-center">
           <div className="mb-4 flex justify-center">
-             <Logo />
+             <Image src="/logo.png" alt="AquaGuard Logo" width={64} height={64} />
           </div>
           <CardTitle className="font-headline text-3xl">Welcome Back</CardTitle>
           <CardDescription>Enter your credentials to access your AquaGuard account.</CardDescription>
