@@ -34,6 +34,33 @@ export function SignupForm() {
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     setLoading(true);
+    
+    // To-do: Implement backend registration logic
+    /*
+    try {
+      const response = await fetch("/api/user/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(values),
+      });
+
+      if (!response.ok) {
+        throw new Error("Registration failed");
+      }
+
+      // Handle successful registration
+      router.push('/dashboard');
+
+    } catch (error) {
+      console.error(error);
+      // Handle error (e.g., show a toast notification)
+    } finally {
+      setLoading(false);
+    }
+    */
+    
     // Simulate API call
     setTimeout(() => {
       // In a real app, you would handle registration here
