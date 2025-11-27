@@ -14,6 +14,8 @@ export default function DashboardLayout({
 }) {
   const pathname = usePathname();
 
+  const isActive = (path: string) => pathname === path || (path !== '/dashboard' && pathname.startsWith(path));
+
   return (
     <SidebarProvider>
       <Sidebar>
@@ -32,13 +34,13 @@ export default function DashboardLayout({
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton as={Link} href="/dashboard/sensors" isActive={pathname === '/dashboard/sensors'} tooltip="Sensors">
+              <SidebarMenuButton as={Link} href="/dashboard/sensors" isActive={isActive('/dashboard/sensors')} tooltip="Sensors">
                 <Droplet />
-                Sensors
+                Sensores
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton as={Link} href="/dashboard/alerts" isActive={pathname === '/dashboard/alerts'} tooltip="Alerts">
+              <SidebarMenuButton as={Link} href="/dashboard/alerts" isActive={isActive('/dashboard/alerts')} tooltip="Alerts">
                 <Bell />
                 Alerts
               </SidebarMenuButton>
