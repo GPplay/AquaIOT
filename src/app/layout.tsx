@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   title: 'AquaGuard',
   description: 'Sistema de Alerta Temprana de Inundaciones',
   icons: {
-    icon: '/logo.png',
+    icon: '/logo.png?v=1',
   },
 };
 
