@@ -26,6 +26,33 @@ export function LoginForm() {
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     setLoading(true);
+    
+    // To-do: Implement backend login logic
+    /*
+    try {
+      const response = await fetch("http://localhost:9001/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(values),
+      });
+
+      if (!response.ok) {
+        throw new Error("Login failed");
+      }
+
+      // Handle successful login
+      router.push('/dashboard');
+
+    } catch (error) {
+      console.error(error);
+      // Handle error (e.g., show a toast notification)
+    } finally {
+      setLoading(false);
+    }
+    */
+
     // Simulate API call
     setTimeout(() => {
       // In a real app, you would handle authentication here
