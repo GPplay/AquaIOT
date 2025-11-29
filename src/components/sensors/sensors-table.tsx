@@ -9,12 +9,12 @@ import { MoreHorizontal, Trash2, Edit, Wifi, WifiOff, Wrench } from "lucide-reac
 import { useState } from "react";
 
 const initialSensors = [
-  { id: 'ESP001', name: 'Dispositivo Boca del Río', area: 'Barrio Chino', macAddress: '3C:71:BF:4C:4C:AC', status: 'online', last_reading: '4.6m', battery: 95 },
-  { id: 'ESP002', name: 'Dispositivo Canal Getsemaní', area: 'Getsemaní', macAddress: '84:0D:8E:95:5E:28', status: 'online', last_reading: '3.2m', battery: 80 },
-  { id: 'ESP003', name: 'Muelle Bocagrande', area: 'Bocagrande', macAddress: 'A0:20:A6:10:4E:5A', status: 'offline', last_reading: '2.1m', battery: 20 },
-  { id: 'ESP004', name: 'Puente El Pozón', area: 'El Pozón', macAddress: 'BC:DD:C2:72:A4:9C', status: 'online', last_reading: '25 m³/s', battery: 100 },
-  { id: 'ESP005', name: 'Bahía de Manga', area: 'Manga', macAddress: '40:F5:20:41:A7:B0', status: 'maintenance', last_reading: '3.5m', battery: 55 },
-  { id: 'ESP006', name: 'Laguna del Cabrero', area: 'Marbella', macAddress: 'CC:50:E3:8A:A8:B4', status: 'online', last_reading: '30 PSU', battery: 72 },
+  { name: 'Dispositivo Boca del Río', area: 'Barrio Chino', macAddress: '3C:71:BF:4C:4C:AC', status: 'online', last_reading: '4.6m', battery: 95 },
+  { name: 'Dispositivo Canal Getsemaní', area: 'Getsemaní', macAddress: '84:0D:8E:95:5E:28', status: 'online', last_reading: '3.2m', battery: 80 },
+  { name: 'Muelle Bocagrande', area: 'Bocagrande', macAddress: 'A0:20:A6:10:4E:5A', status: 'offline', last_reading: '2.1m', battery: 20 },
+  { name: 'Puente El Pozón', area: 'El Pozón', macAddress: 'BC:DD:C2:72:A4:9C', status: 'online', last_reading: '25 m³/s', battery: 100 },
+  { name: 'Bahía de Manga', area: 'Manga', macAddress: '40:F5:20:41:A7:B0', status: 'maintenance', last_reading: '3.5m', battery: 55 },
+  { name: 'Laguna del Cabrero', area: 'Marbella', macAddress: 'CC:50:E3:8A:A8:B4', status: 'online', last_reading: '30 PSU', battery: 72 },
 ];
 
 const statusConfig: { [key: string]: { variant: 'default' | 'secondary' | 'destructive' | 'outline' | null | undefined, icon: React.ReactNode, label: string } } = {
@@ -26,8 +26,8 @@ const statusConfig: { [key: string]: { variant: 'default' | 'secondary' | 'destr
 export function SensorsTable() {
     const [sensors, setSensors] = useState(initialSensors);
 
-    const handleDelete = (id: string) => {
-        setSensors(sensors.filter(sensor => sensor.id !== id));
+    const handleDelete = (macAddress: string) => {
+        setSensors(sensors.filter(sensor => sensor.macAddress !== macAddress));
     }
 
   return (
@@ -41,7 +41,6 @@ export function SensorsTable() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>ID del Dispositivo</TableHead>
                 <TableHead>Nombre</TableHead>
                 <TableHead>Ubicación</TableHead>
                 <TableHead>Dirección MAC</TableHead>
@@ -53,8 +52,7 @@ export function SensorsTable() {
             </TableHeader>
             <TableBody>
               {sensors.map((sensor) => (
-                <TableRow key={sensor.id}>
-                  <TableCell className="font-mono text-xs">{sensor.id}</TableCell>
+                <TableRow key={sensor.macAddress}>
                   <TableCell className="font-medium">{sensor.name}</TableCell>
                   <TableCell>{sensor.area}</TableCell>
                   <TableCell className="font-mono text-xs">{sensor.macAddress}</TableCell>
@@ -79,7 +77,7 @@ export function SensorsTable() {
                                 Editar
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem className="text-destructive" onClick={() => handleDelete(sensor.id)}>
+                            <DropdownMenuItem className="text-destructive" onClick={() => handleDelete(sensor.macAddress)}>
                                 <Trash2 className="mr-2" />
                                 Eliminar
                             </DropdownMenuItem>
