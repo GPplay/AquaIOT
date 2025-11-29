@@ -13,9 +13,9 @@ import { Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const formSchema = z.object({
-  name: z.string().min(3, 'Name must be at least 3 characters.'),
-  area: z.string().min(3, 'Location must be at least 3 characters.'),
-  type: z.enum(['Water Level', 'Flow Rate', 'Tide Gauge', 'Salinity', 'Rainfall']),
+  name: z.string().min(3, 'El nombre debe tener al menos 3 caracteres.'),
+  area: z.string().min(3, 'La ubicación debe tener al menos 3 caracteres.'),
+  type: z.enum(['Nivel de Agua', 'Caudal', 'Mareógrafo', 'Salinidad', 'Pluviómetro']),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -30,7 +30,7 @@ export function AddSensorDialog({ children }: { children: React.ReactNode }) {
     defaultValues: {
       name: '',
       area: '',
-      type: 'Water Level',
+      type: 'Nivel de Agua',
     },
   });
 
@@ -38,13 +38,13 @@ export function AddSensorDialog({ children }: { children: React.ReactNode }) {
     setLoading(true);
     // Simulate API call to add a sensor
     await new Promise(resolve => setTimeout(resolve, 1500));
-    console.log('New sensor added:', values);
+    console.log('Nuevo dispositivo añadido:', values);
     setLoading(false);
     setOpen(false);
     form.reset();
     toast({
-        title: "Sensor Added",
-        description: `Sensor "${values.name}" has been successfully added.`,
+        title: "Dispositivo Añadido",
+        description: `El dispositivo "${values.name}" ha sido añadido correctamente.`,
     })
   };
 
@@ -55,9 +55,9 @@ export function AddSensorDialog({ children }: { children: React.ReactNode }) {
         </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="font-headline text-2xl">Add New Sensor</DialogTitle>
+          <DialogTitle className="font-headline text-2xl">Añadir Nuevo Dispositivo ESP</DialogTitle>
           <DialogDescription>
-            Enter the details of the new sensor to connect it to the AquaGuard network.
+            Introduce los detalles del nuevo dispositivo para conectarlo a la red de AquaGuard.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -67,9 +67,9 @@ export function AddSensorDialog({ children }: { children: React.ReactNode }) {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Sensor Name</FormLabel>
+                  <FormLabel>Nombre del Dispositivo</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g., River Mouth Sensor" {...field} />
+                    <Input placeholder="Ej: Dispositivo Boca del Río" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -80,9 +80,9 @@ export function AddSensorDialog({ children }: { children: React.ReactNode }) {
               name="area"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Location / Area</FormLabel>
+                  <FormLabel>Ubicación / Área</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g., Barrio Chino" {...field} />
+                    <Input placeholder="Ej: Barrio Chino" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -93,19 +93,19 @@ export function AddSensorDialog({ children }: { children: React.ReactNode }) {
               name="type"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Sensor Type</FormLabel>
+                  <FormLabel>Tipo de Medición</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select a sensor type" />
+                        <SelectValue placeholder="Selecciona un tipo de medición" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="Water Level">Water Level</SelectItem>
-                      <SelectItem value="Flow Rate">Flow Rate</SelectItem>
-                      <SelectItem value="Tide Gauge">Tide Gauge</SelectItem>
-                      <SelectItem value="Salinity">Salinity</SelectItem>
-                      <SelectItem value="Rainfall">Rainfall</SelectItem>
+                      <SelectItem value="Nivel de Agua">Nivel de Agua</SelectItem>
+                      <SelectItem value="Caudal">Caudal</SelectItem>
+                      <SelectItem value="Mareógrafo">Mareógrafo</SelectItem>
+                      <SelectItem value="Salinidad">Salinidad</SelectItem>
+                      <SelectItem value="Pluviómetro">Pluviómetro</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -113,10 +113,10 @@ export function AddSensorDialog({ children }: { children: React.ReactNode }) {
               )}
             />
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
+              <Button type="button" variant="outline" onClick={() => setOpen(false)}>Cancelar</Button>
               <Button type="submit" disabled={loading}>
                 {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                Add Sensor
+                Añadir Dispositivo
               </Button>
             </DialogFooter>
           </form>

@@ -11,15 +11,15 @@ export default function LoginPage() {
           <div className="mb-4 flex justify-center">
              <Image src="/logo.png" alt="AquaGuard Logo" width={64} height={64} />
           </div>
-          <CardTitle className="font-headline text-3xl">Welcome Back</CardTitle>
-          <CardDescription>Enter your credentials to access your AquaGuard account.</CardDescription>
+          <CardTitle className="font-headline text-3xl">Bienvenido de Nuevo</CardTitle>
+          <CardDescription>Ingresa tus credenciales para acceder a tu cuenta de AquaGuard.</CardDescription>
         </CardHeader>
         <CardContent>
           <LoginForm />
           <p className="mt-6 text-center text-sm text-muted-foreground">
-            Don&apos;t have an account?{' '}
+            ¿No tienes una cuenta?{' '}
             <Link href="/signup" className="font-semibold text-primary underline-offset-4 hover:underline">
-              Sign up
+              Regístrate
             </Link>
           </p>
         </CardContent>

@@ -21,7 +21,7 @@ export function MetricCard({ title, value, icon, change, variant = "default" }: 
         <div className="text-2xl font-bold">{value}</div>
         {change && (
           <p className={cn("text-xs text-muted-foreground", { "text-red-500 dark:text-red-400": variant === "destructive" })}>
-            {change} from last hour
+            {change} desde la última hora
           </p>
         )}
       </CardContent>

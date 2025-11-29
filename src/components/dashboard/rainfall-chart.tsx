@@ -5,18 +5,18 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 
 const chartData = [
-  { date: 'Mon', rainfall: 4 },
-  { date: 'Tue', rainfall: 3 },
-  { date: 'Wed', rainfall: 9 },
-  { date: 'Thu', rainfall: 5 },
-  { date: 'Fri', rainfall: 12 },
-  { date: 'Sat', rainfall: 8 },
-  { date: 'Sun', rainfall: 15 },
+  { date: 'Lun', rainfall: 4 },
+  { date: 'Mar', rainfall: 3 },
+  { date: 'Mié', rainfall: 9 },
+  { date: 'Jue', rainfall: 5 },
+  { date: 'Vie', rainfall: 12 },
+  { date: 'Sáb', rainfall: 8 },
+  { date: 'Dom', rainfall: 15 },
 ];
 
 const chartConfig = {
     rainfall: {
-        label: 'Rainfall',
+        label: 'Precipitación',
         color: 'hsl(var(--accent))',
     },
 };
@@ -25,8 +25,8 @@ export function RainfallChart() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Weekly Rainfall</CardTitle>
-        <CardDescription>Rainfall accumulation over the last 7 days</CardDescription>
+        <CardTitle>Precipitación Semanal</CardTitle>
+        <CardDescription>Acumulación de precipitación en los últimos 7 días</CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig} className="h-[250px] w-full">

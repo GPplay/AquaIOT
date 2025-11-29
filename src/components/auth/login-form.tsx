@@ -12,8 +12,8 @@ import { Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const formSchema = z.object({
-  email: z.string().email('Invalid email address.'),
-  password: z.string().min(6, 'Password must be at least 6 characters.'),
+  email: z.string().email('Dirección de correo electrónico inválida.'),
+  password: z.string().min(6, 'La contraseña debe tener al menos 6 caracteres.'),
 });
 
 export function LoginForm() {
@@ -63,7 +63,7 @@ export function LoginForm() {
     // Simulate API call
     setTimeout(() => {
       // In a real app, you would handle authentication here
-      console.log('Login attempt with:', values.email);
+      console.log('Intento de inicio de sesión con:', values.email);
       // For now, we'll just navigate to the dashboard
       router.push('/dashboard');
     }, 1000);
@@ -77,9 +77,9 @@ export function LoginForm() {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email</FormLabel>
+              <FormLabel>Correo Electrónico</FormLabel>
               <FormControl>
-                <Input placeholder="your.email@example.com" {...field} />
+                <Input placeholder="tu.email@ejemplo.com" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -90,7 +90,7 @@ export function LoginForm() {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Password</FormLabel>
+              <FormLabel>Contraseña</FormLabel>
               <FormControl>
                 <Input type="password" placeholder="••••••••" {...field} />
               </FormControl>
@@ -100,7 +100,7 @@ export function LoginForm() {
         />
         <Button type="submit" className="w-full" disabled={loading}>
           {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          Log in
+          Iniciar Sesión
         </Button>
       </form>
     </Form>

@@ -19,7 +19,7 @@ const FloodRiskAssessmentInputSchema = z.object({
 export type FloodRiskAssessmentInput = z.infer<typeof FloodRiskAssessmentInputSchema>;
 
 const FloodRiskAssessmentOutputSchema = z.object({
-  riskLevel: z.enum(['low', 'medium', 'high']).describe('The assessed flood risk level.'),
+  riskLevel: z.enum(['bajo', 'medio', 'alto']).describe('The assessed flood risk level.'),
   riskFactors: z.string().describe('Key factors contributing to the flood risk.'),
   recommendations: z.string().describe('Recommendations for preparedness and mitigation.'),
 });
@@ -33,15 +33,15 @@ const floodRiskAssessmentPrompt = ai.definePrompt({
   name: 'floodRiskAssessmentPrompt',
   input: {schema: FloodRiskAssessmentInputSchema},
   output: {schema: FloodRiskAssessmentOutputSchema},
-  prompt: `You are an AI-powered flood risk assessment tool. Analyze the provided sensor data, historical data, and weather forecasts to determine the current and near-future risk of flooding.
+  prompt: `You are an AI-powered flood risk assessment tool. Analyze the provided sensor data, historical data, and weather forecasts to determine the current and near-future risk of flooding. Your response and analysis must be in Spanish.
 
 Sensor Data: {{{sensorData}}}
 Historical Data: {{{historicalData}}}
 Weather Forecast: {{{weatherForecast}}}
 
-Based on this information, determine the risk level (low, medium, or high), identify the key risk factors, and provide recommendations for preparedness and mitigation.
+Based on this information, determine the risk level (bajo, medio, or alto), identify the key risk factors, and provide recommendations for preparedness and mitigation.
 
-Ensure that the output matches the FloodRiskAssessmentOutputSchema, with descriptions from the schema being used when determining the values to set.`, 
+Ensure that the output matches the FloodRiskAssessmentOutputSchema, with descriptions from the schema being used when determining the values to set. The entire output must be in Spanish.`, 
 });
 
 const assessFloodRiskFlow = ai.defineFlow(

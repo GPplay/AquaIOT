@@ -1,7 +1,7 @@
 'use client';
 
 import { SidebarProvider, Sidebar, SidebarInset, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarFooter } from "@/components/ui/sidebar";
-import { LayoutDashboard, Droplet, Settings, Bell } from "lucide-react";
+import { LayoutDashboard, Droplet, Settings, Bell, Wifi } from "lucide-react";
 import Image from "next/image";
 import { Header } from "@/components/header";
 import Link from "next/link";
@@ -21,28 +21,28 @@ export default function DashboardLayout({
       <Sidebar>
         <SidebarHeader>
           <Link href="/dashboard" className="flex items-center gap-2">
-            <Image src="/logo.png" alt="AquaGuard Logo" width={48} height={48} />
+            <Image src="/logo.png" alt="AquaGuard Logo" width={32} height={32} />
             <h1 className="font-headline text-xl font-semibold text-primary">AquaGuard</h1>
           </Link>
         </SidebarHeader>
         <SidebarContent>
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton as={Link} href="/dashboard" isActive={pathname === '/dashboard'} tooltip="Dashboard">
+              <SidebarMenuButton as={Link} href="/dashboard" isActive={pathname === '/dashboard'} tooltip="Panel de Control">
                 <LayoutDashboard />
-                Dashboard
+                Panel de Control
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton as={Link} href="/dashboard/sensors" isActive={isActive('/dashboard/sensors')} tooltip="Sensors">
-                <Droplet />
-                Sensores
+              <SidebarMenuButton as={Link} href="/dashboard/sensors" isActive={isActive('/dashboard/sensors')} tooltip="Dispositivos ESP">
+                <Wifi />
+                Dispositivos ESP
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton as={Link} href="/dashboard/alerts" isActive={isActive('/dashboard/alerts')} tooltip="Alerts">
+              <SidebarMenuButton as={Link} href="/dashboard/alerts" isActive={isActive('/dashboard/alerts')} tooltip="Alertas">
                 <Bell />
-                Alerts
+                Alertas
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
@@ -50,9 +50,9 @@ export default function DashboardLayout({
         <SidebarFooter>
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton as={Link} href="#" tooltip="Settings">
+              <SidebarMenuButton as={Link} href="#" tooltip="Configuración">
                 <Settings />
-                Settings
+                Configuración
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>

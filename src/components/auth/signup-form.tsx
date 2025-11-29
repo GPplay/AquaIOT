@@ -13,14 +13,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { useToast } from '@/hooks/use-toast';
 
 const formSchema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters.'),
-  email: z.string().email('Invalid email address.'),
+  name: z.string().min(2, 'El nombre debe tener al menos 2 caracteres.'),
+  email: z.string().email('Dirección de correo electrónico inválida.'),
   phonePrefix: z.string(),
-  phoneNumber: z.string().min(7, 'Phone number must be at least 7 digits.'),
-  password: z.string().min(6, 'Password must be at least 6 characters.'),
-  confirmPassword: z.string().min(6, 'Password must be at least 6 characters.'),
+  phoneNumber: z.string().min(7, 'El número de teléfono debe tener al menos 7 dígitos.'),
+  password: z.string().min(6, 'La contraseña debe tener al menos 6 caracteres.'),
+  confirmPassword: z.string().min(6, 'La contraseña debe tener al menos 6 caracteres.'),
 }).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
+  message: "Las contraseñas no coinciden",
   path: ["confirmPassword"],
 });
 
@@ -84,9 +84,9 @@ export function SignupForm() {
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Name</FormLabel>
+              <FormLabel>Nombre</FormLabel>
               <FormControl>
-                <Input placeholder="Your Name" {...field} />
+                <Input placeholder="Tu Nombre" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -97,9 +97,9 @@ export function SignupForm() {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email</FormLabel>
+              <FormLabel>Correo Electrónico</FormLabel>
               <FormControl>
-                <Input placeholder="your.email@example.com" {...field} />
+                <Input placeholder="tu.email@ejemplo.com" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -111,11 +111,11 @@ export function SignupForm() {
             name="phonePrefix"
             render={({ field }) => (
                 <FormItem className="w-1/3">
-                <FormLabel>Prefix</FormLabel>
+                <FormLabel>Prefijo</FormLabel>
                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
                     <SelectTrigger>
-                        <SelectValue placeholder="Prefix" />
+                        <SelectValue placeholder="Prefijo" />
                     </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -133,7 +133,7 @@ export function SignupForm() {
             name="phoneNumber"
             render={({ field }) => (
                 <FormItem className="w-2/3">
-                <FormLabel>Phone Number</FormLabel>
+                <FormLabel>Número de Teléfono</FormLabel>
                 <FormControl>
                     <Input placeholder="3001234567" {...field} />
                 </FormControl>
@@ -147,7 +147,7 @@ export function SignupForm() {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Password</FormLabel>
+              <FormLabel>Contraseña</FormLabel>
               <FormControl>
                 <Input type="password" placeholder="••••••••" {...field} />
               </FormControl>
@@ -160,7 +160,7 @@ export function SignupForm() {
           name="confirmPassword"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Confirm Password</FormLabel>
+              <FormLabel>Confirmar Contraseña</FormLabel>
               <FormControl>
                 <Input type="password" placeholder="••••••••" {...field} />
               </FormControl>
@@ -170,7 +170,7 @@ export function SignupForm() {
         />
         <Button type="submit" className="w-full" disabled={loading}>
           {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          Sign up
+          Registrarse
         </Button>
       </form>
     </Form>

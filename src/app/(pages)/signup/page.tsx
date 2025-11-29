@@ -11,15 +11,15 @@ export default function SignupPage() {
           <div className="mb-4 flex justify-center">
              <Image src="/logo.png" alt="AquaGuard Logo" width={64} height={64} />
           </div>
-          <CardTitle className="font-headline text-3xl">Create an Account</CardTitle>
-          <CardDescription>Enter your details to get started with AquaGuard.</CardDescription>
+          <CardTitle className="font-headline text-3xl">Crear una Cuenta</CardTitle>
+          <CardDescription>Ingresa tus datos para comenzar con AquaGuard.</CardDescription>
         </CardHeader>
         <CardContent>
           <SignupForm />
           <p className="mt-6 text-center text-sm text-muted-foreground">
-            Already have an account?{' '}
+            ¿Ya tienes una cuenta?{' '}
             <Link href="/login" className="font-semibold text-primary underline-offset-4 hover:underline">
-              Log in
+              Inicia sesión
             </Link>
           </p>
         </CardContent>

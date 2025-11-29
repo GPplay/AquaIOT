@@ -3,36 +3,36 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 
 const alerts = [
-  { id: 'ALRT001', risk: 'high', area: 'Barrio Chino', timestamp: '2024-07-29 14:30', sensor_val: '4.6m' },
-  { id: 'ALRT002', risk: 'medium', area: 'Getsemaní', timestamp: '2024-07-29 12:15', sensor_val: '3.2m' },
-  { id: 'ALRT003', risk: 'low', area: 'Bocagrande', timestamp: '2024-07-29 09:00', sensor_val: '2.1m' },
-  { id: 'ALRT004', risk: 'high', area: 'El Pozón', timestamp: '2024-07-28 22:45', sensor_val: '4.8m' },
-  { id: 'ALRT005', risk: 'medium', area: 'Manga', timestamp: '2024-07-28 18:00', sensor_val: '3.5m' },
+  { id: 'ALRT001', risk: 'alto', area: 'Barrio Chino', timestamp: '2024-07-29 14:30', sensor_val: '4.6m' },
+  { id: 'ALRT002', risk: 'medio', area: 'Getsemaní', timestamp: '2024-07-29 12:15', sensor_val: '3.2m' },
+  { id: 'ALRT003', risk: 'bajo', area: 'Bocagrande', timestamp: '2024-07-29 09:00', sensor_val: '2.1m' },
+  { id: 'ALRT004', risk: 'alto', area: 'El Pozón', timestamp: '2024-07-28 22:45', sensor_val: '4.8m' },
+  { id: 'ALRT005', risk: 'medio', area: 'Manga', timestamp: '2024-07-28 18:00', sensor_val: '3.5m' },
 ];
 
 const riskVariants: { [key: string]: 'default' | 'secondary' | 'destructive' | 'outline' | null | undefined } = {
-  low: 'secondary',
-  medium: 'default',
-  high: 'destructive',
+  bajo: 'secondary',
+  medio: 'default',
+  alto: 'destructive',
 };
 
 export function AlertsTable() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Recent Alerts</CardTitle>
-        <CardDescription>A log of recent flood risk alerts issued by the system.</CardDescription>
+        <CardTitle>Alertas Recientes</CardTitle>
+        <CardDescription>Un registro de las alertas de riesgo de inundación recientes emitidas por el sistema.</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="relative w-full overflow-auto">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Alert ID</TableHead>
-                <TableHead>Risk Level</TableHead>
-                <TableHead>Affected Area</TableHead>
-                <TableHead>Sensor Reading</TableHead>
-                <TableHead>Timestamp</TableHead>
+                <TableHead>ID de Alerta</TableHead>
+                <TableHead>Nivel de Riesgo</TableHead>
+                <TableHead>Área Afectada</TableHead>
+                <TableHead>Lectura del Dispositivo</TableHead>
+                <TableHead>Fecha y Hora</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
