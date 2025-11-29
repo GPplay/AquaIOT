@@ -9,12 +9,12 @@ import { MoreHorizontal, Trash2, Edit, Wifi, WifiOff, Wrench } from "lucide-reac
 import { useState } from "react";
 
 const initialSensors = [
-  { name: 'Dispositivo Boca del Río', area: 'Barrio Chino', macAddress: '3C:71:BF:4C:4C:AC', status: 'online', last_reading: '4.6m', battery: 95 },
-  { name: 'Dispositivo Canal Getsemaní', area: 'Getsemaní', macAddress: '84:0D:8E:95:5E:28', status: 'online', last_reading: '3.2m', battery: 80 },
-  { name: 'Muelle Bocagrande', area: 'Bocagrande', macAddress: 'A0:20:A6:10:4E:5A', status: 'offline', last_reading: '2.1m', battery: 20 },
-  { name: 'Puente El Pozón', area: 'El Pozón', macAddress: 'BC:DD:C2:72:A4:9C', status: 'online', last_reading: '25 m³/s', battery: 100 },
-  { name: 'Bahía de Manga', area: 'Manga', macAddress: '40:F5:20:41:A7:B0', status: 'maintenance', last_reading: '3.5m', battery: 55 },
-  { name: 'Laguna del Cabrero', area: 'Marbella', macAddress: 'CC:50:E3:8A:A8:B4', status: 'online', last_reading: '30 PSU', battery: 72 },
+  { name: 'Dispositivo Boca del Río', area: 'Barrio Chino', macAddress: '3C:71:BF:4C:4C:AC', status: 'online' },
+  { name: 'Dispositivo Canal Getsemaní', area: 'Getsemaní', macAddress: '84:0D:8E:95:5E:28', status: 'online' },
+  { name: 'Muelle Bocagrande', area: 'Bocagrande', macAddress: 'A0:20:A6:10:4E:5A', status: 'offline' },
+  { name: 'Puente El Pozón', area: 'El Pozón', macAddress: 'BC:DD:C2:72:A4:9C', status: 'online' },
+  { name: 'Bahía de Manga', area: 'Manga', macAddress: '40:F5:20:41:A7:B0', status: 'maintenance' },
+  { name: 'Laguna del Cabrero', area: 'Marbella', macAddress: 'CC:50:E3:8A:A8:B4', status: 'online' },
 ];
 
 const statusConfig: { [key: string]: { variant: 'default' | 'secondary' | 'destructive' | 'outline' | null | undefined, icon: React.ReactNode, label: string } } = {
@@ -45,8 +45,6 @@ export function SensorsTable() {
                 <TableHead>Ubicación</TableHead>
                 <TableHead>Dirección MAC</TableHead>
                 <TableHead>Estado</TableHead>
-                <TableHead>Batería</TableHead>
-                <TableHead>Última Lectura</TableHead>
                 <TableHead className="text-right">Acciones</TableHead>
               </TableRow>
             </TableHeader>
@@ -62,8 +60,6 @@ export function SensorsTable() {
                         {statusConfig[sensor.status]?.label}
                     </Badge>
                   </TableCell>
-                  <TableCell>{sensor.battery}%</TableCell>
-                  <TableCell>{sensor.last_reading}</TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
