@@ -3,11 +3,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 
 const alerts = [
-  { id: 'ALRT001', risk: 'alto', area: 'Barrio Chino', timestamp: '2024-07-29 14:30', sensor_val: '4.6m' },
-  { id: 'ALRT002', risk: 'medio', area: 'Getsemaní', timestamp: '2024-07-29 12:15', sensor_val: '3.2m' },
-  { id: 'ALRT003', risk: 'bajo', area: 'Bocagrande', timestamp: '2024-07-29 09:00', sensor_val: '2.1m' },
-  { id: 'ALRT004', risk: 'alto', area: 'El Pozón', timestamp: '2024-07-28 22:45', sensor_val: '4.8m' },
-  { id: 'ALRT005', risk: 'medio', area: 'Manga', timestamp: '2024-07-28 18:00', sensor_val: '3.5m' },
+  { id: 'ALRT001', risk: 'alto', device: 'Dispositivo Boca del Río', area: 'Barrio Chino', timestamp: '2024-07-29 14:30' },
+  { id: 'ALRT002', risk: 'medio', device: 'Dispositivo Canal Getsemaní', area: 'Getsemaní', timestamp: '2024-07-29 12:15' },
+  { id: 'ALRT003', risk: 'bajo', device: 'Muelle Bocagrande', area: 'Bocagrande', timestamp: '2024-07-29 09:00' },
+  { id: 'ALRT004', risk: 'alto', device: 'Puente El Pozón', area: 'El Pozón', timestamp: '2024-07-28 22:45' },
+  { id: 'ALRT005', risk: 'medio', device: 'Bahía de Manga', area: 'Manga', timestamp: '2024-07-28 18:00' },
 ];
 
 const riskVariants: { [key: string]: 'default' | 'secondary' | 'destructive' | 'outline' | null | undefined } = {
@@ -30,8 +30,8 @@ export function AlertsTable() {
               <TableRow>
                 <TableHead>ID de Alerta</TableHead>
                 <TableHead>Nivel de Riesgo</TableHead>
+                <TableHead>Dispositivo ESP</TableHead>
                 <TableHead>Área Afectada</TableHead>
-                <TableHead>Lectura del Dispositivo</TableHead>
                 <TableHead>Fecha y Hora</TableHead>
               </TableRow>
             </TableHeader>
@@ -42,8 +42,8 @@ export function AlertsTable() {
                   <TableCell>
                     <Badge variant={riskVariants[alert.risk]} className="capitalize">{alert.risk}</Badge>
                   </TableCell>
+                  <TableCell>{alert.device}</TableCell>
                   <TableCell>{alert.area}</TableCell>
-                  <TableCell>{alert.sensor_val}</TableCell>
                   <TableCell>{alert.timestamp}</TableCell>
                 </TableRow>
               ))}
