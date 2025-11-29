@@ -4,36 +4,26 @@ import { Bar, BarChart, CartesianGrid, ResponsiveContainer, XAxis, YAxis } from 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 
-const chartData = [
-  { time: 'Hace 6h', level: 1.8 },
-  { time: 'Hace 5h', level: 1.9 },
-  { time: 'Hace 4h', level: 2.1 },
-  { time: 'Hace 3h', level: 2.2 },
-  { time: 'Hace 2h', level: 2.4 },
-  { time: 'Hace 1h', level: 2.3 },
-  { time: 'Ahora', level: 2.5 },
-];
-
 const chartConfig = {
     level: {
         label: 'Nivel del Agua',
-        color: 'hsl(var(--primary))',
+        color: 'hsl(var(--chart-1))',
     },
 };
 
-export function WaterLevelChart() {
+export function WaterLevelChart({ data }: { data: any[] }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Tendencia del Nivel del Agua</CardTitle>
-        <CardDescription>Nivel del agua en las últimas 6 horas</CardDescription>
+        <CardTitle>Nivel del Agua Semanal</CardTitle>
+        <CardDescription>Tendencia del nivel del agua en los últimos 7 días</CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig} className="h-[250px] w-full">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={chartData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+            <BarChart data={data} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} />
-              <XAxis dataKey="time" tickLine={false} axisLine={false} tickMargin={8} fontSize={12} />
+              <XAxis dataKey="day" tickLine={false} axisLine={false} tickMargin={8} fontSize={12} />
               <YAxis unit="m" tickLine={false} axisLine={false} tickMargin={8} fontSize={12} />
               <ChartTooltip
                 cursor={false}
