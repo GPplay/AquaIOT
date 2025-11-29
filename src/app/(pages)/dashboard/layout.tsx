@@ -1,7 +1,7 @@
 'use client';
 
 import { SidebarProvider, Sidebar, SidebarInset, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarFooter } from "@/components/ui/sidebar";
-import { LayoutDashboard, Droplet, Settings, Bell, Wifi } from "lucide-react";
+import { LayoutDashboard, Settings, Bell, Wifi, User } from "lucide-react";
 import Image from "next/image";
 import { Header } from "@/components/header";
 import Link from "next/link";
@@ -50,7 +50,13 @@ export default function DashboardLayout({
         <SidebarFooter>
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton as={Link} href="#" tooltip="Configuración">
+              <SidebarMenuButton as={Link} href="/dashboard/profile" isActive={isActive('/dashboard/profile')} tooltip="Perfil">
+                <User />
+                Perfil
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton as={Link} href="/dashboard/settings" isActive={isActive('/dashboard/settings')} tooltip="Configuración">
                 <Settings />
                 Configuración
               </SidebarMenuButton>
