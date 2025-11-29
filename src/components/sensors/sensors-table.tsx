@@ -5,7 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from "../ui/dropdown-menu";
 import { Button } from "../ui/button";
-import { MoreHorizontal, Trash2, Edit, Wifi, WifiOff, Wrench } from "lucide-react";
+import { MoreHorizontal, Trash2, Edit, Wifi, WifiOff } from "lucide-react";
 import { useState } from "react";
 
 const initialSensors = [
@@ -13,14 +13,13 @@ const initialSensors = [
   { name: 'Dispositivo Canal Getsemaní', area: 'Getsemaní', macAddress: '84:0D:8E:95:5E:28', status: 'online' },
   { name: 'Muelle Bocagrande', area: 'Bocagrande', macAddress: 'A0:20:A6:10:4E:5A', status: 'offline' },
   { name: 'Puente El Pozón', area: 'El Pozón', macAddress: 'BC:DD:C2:72:A4:9C', status: 'online' },
-  { name: 'Bahía de Manga', area: 'Manga', macAddress: '40:F5:20:41:A7:B0', status: 'maintenance' },
+  { name: 'Bahía de Manga', area: 'Manga', macAddress: '40:F5:20:41:A7:B0', status: 'offline' },
   { name: 'Laguna del Cabrero', area: 'Marbella', macAddress: 'CC:50:E3:8A:A8:B4', status: 'online' },
 ];
 
 const statusConfig: { [key: string]: { variant: 'default' | 'secondary' | 'destructive' | 'outline' | null | undefined, icon: React.ReactNode, label: string } } = {
   online: { variant: 'default', icon: <Wifi className="h-3 w-3" />, label: 'En línea' },
   offline: { variant: 'destructive', icon: <WifiOff className="h-3 w-3" />, label: 'Fuera de línea' },
-  maintenance: { variant: 'secondary', icon: <Wrench className="h-3 w-3" />, label: 'Mantenimiento' },
 };
 
 export function SensorsTable() {
