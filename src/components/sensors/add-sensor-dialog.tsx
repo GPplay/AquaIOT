@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from '@/components/ui/dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -15,7 +14,7 @@ import { useToast } from '@/hooks/use-toast';
 const formSchema = z.object({
   name: z.string().min(3, 'El nombre debe tener al menos 3 caracteres.'),
   area: z.string().min(3, 'La ubicación debe tener al menos 3 caracteres.'),
-  type: z.enum(['Nivel de Agua', 'Caudal', 'Mareógrafo', 'Salinidad', 'Pluviómetro']),
+  macAddress: z.string().regex(/^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/, 'La dirección MAC no es válida.'),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -30,7 +29,7 @@ export function AddSensorDialog({ children }: { children: React.ReactNode }) {
     defaultValues: {
       name: '',
       area: '',
-      type: 'Nivel de Agua',
+      macAddress: '',
     },
   });
 
@@ -90,24 +89,13 @@ export function AddSensorDialog({ children }: { children: React.ReactNode }) {
             />
             <FormField
               control={form.control}
-              name="type"
+              name="macAddress"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Tipo de Medición</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecciona un tipo de medición" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="Nivel de Agua">Nivel de Agua</SelectItem>
-                      <SelectItem value="Caudal">Caudal</SelectItem>
-                      <SelectItem value="Mareógrafo">Mareógrafo</SelectItem>
-                      <SelectItem value="Salinidad">Salinidad</SelectItem>
-                      <SelectItem value="Pluviómetro">Pluviómetro</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <FormLabel>Dirección MAC del ESP</FormLabel>
+                  <FormControl>
+                    <Input placeholder="00:1B:44:11:3A:B7" {...field} />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
