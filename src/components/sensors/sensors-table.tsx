@@ -41,9 +41,9 @@ export function SensorsTable() {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead>Dirección MAC</TableHead>
                 <TableHead>Nombre</TableHead>
                 <TableHead>Ubicación</TableHead>
-                <TableHead>Dirección MAC</TableHead>
                 <TableHead>Estado</TableHead>
                 <TableHead className="text-right">Acciones</TableHead>
               </TableRow>
@@ -51,9 +51,9 @@ export function SensorsTable() {
             <TableBody>
               {sensors.map((sensor) => (
                 <TableRow key={sensor.macAddress}>
+                  <TableCell className="font-mono text-xs">{sensor.macAddress}</TableCell>
                   <TableCell className="font-medium">{sensor.name}</TableCell>
                   <TableCell>{sensor.area}</TableCell>
-                  <TableCell className="font-mono text-xs">{sensor.macAddress}</TableCell>
                   <TableCell>
                     <Badge variant={statusConfig[sensor.status]?.variant} className="capitalize gap-1.5">
                         {statusConfig[sensor.status]?.icon}
