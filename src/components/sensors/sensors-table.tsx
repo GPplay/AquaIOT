@@ -5,7 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from "../ui/dropdown-menu";
 import { Button } from "../ui/button";
-import { MoreHorizontal, Trash2, Edit, Wifi, WifiOff, Tool } from "lucide-react";
+import { MoreHorizontal, Trash2, Edit, Wifi, WifiOff, Wrench } from "lucide-react";
 import { useState } from "react";
 
 const initialSensors = [
@@ -20,7 +20,7 @@ const initialSensors = [
 const statusConfig: { [key: string]: { variant: 'default' | 'secondary' | 'destructive' | 'outline' | null | undefined, icon: React.ReactNode, label: string } } = {
   online: { variant: 'default', icon: <Wifi className="h-3 w-3" />, label: 'En línea' },
   offline: { variant: 'destructive', icon: <WifiOff className="h-3 w-3" />, label: 'Fuera de línea' },
-  maintenance: { variant: 'secondary', icon: <Tool className="h-3 w-3" />, label: 'Mantenimiento' },
+  maintenance: { variant: 'secondary', icon: <Wrench className="h-3 w-3" />, label: 'Mantenimiento' },
 };
 
 export function SensorsTable() {
