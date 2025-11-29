@@ -5,7 +5,7 @@ export const mockWeeklyWaterLevel = [
   { day: 'Mié', level: 2.0 },
   { day: 'Jue', level: 2.4 },
   { day: 'Vie', level: 2.3 },
-  { day Tarea', level: 2.5 },
+  { day: 'Sáb', level: 2.5 },
 ];
 
 export const mockDeviceData: { [key: string]: any } = {
