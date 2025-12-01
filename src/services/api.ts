@@ -1,3 +1,4 @@
+'use client';
 // This file is intended to house all the backend API communication logic.
 
 const API_BASE_URL = 'http://localhost:9001/api';
@@ -9,13 +10,20 @@ const API_BASE_URL = 'http://localhost:9001/api';
  * @returns An object containing the authentication token and user data.
  */
 export async function login(email: string, password: string): Promise<{ token: string, user: any }> {
-  const response = await fetch(`${API_BASE_URL}/auth/login`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ email, password }),
-  });
+  let response;
+  try {
+    response = await fetch(`${API_BASE_URL}/auth/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password }),
+    });
+  } catch (error) {
+    console.error('Network error:', error);
+    throw new Error('No se pudo conectar con el servidor. Por favor, inténtalo más tarde.');
+  }
+
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({ message: 'Error de autenticación. Por favor, verifica tus credenciales.' }));
