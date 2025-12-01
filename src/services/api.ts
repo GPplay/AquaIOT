@@ -21,7 +21,7 @@ export async function login(email: string, password: string): Promise<{ token: s
     });
   } catch (error) {
     console.error('Network error:', error);
-    throw new Error('No se pudo conectar con el servidor. Por favor, inténtalo más tarde.');
+    throw new Error('No hay servidores disponibles.');
   }
 
 
