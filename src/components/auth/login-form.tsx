@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { login } from '@/services/api';
 
 const formSchema = z.object({
   email: z.string().email('Dirección de correo electrónico inválida.'),
@@ -26,47 +27,33 @@ export function LoginForm() {
     defaultValues: { email: '', password: '' },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     setLoading(true);
     
-    // To-do: Implement backend login logic
-    /*
     try {
-      const response = await fetch("http://localhost:9001/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(values),
+      const { token } = await login(values.email, values.password);
+      
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('authToken', token);
+      }
+      
+      toast({
+        title: "Inicio de Sesión Exitoso",
+        description: "¡Bienvenido de nuevo!",
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || `Error ${response.status}: Login failed`);
-      }
-
-      // Handle successful login
       router.push('/dashboard');
 
     } catch (error: any) {
       console.error(error);
       toast({
         variant: "destructive",
-        title: "Login Failed",
-        description: error.message,
+        title: "Falló el inicio de sesión",
+        description: error.message || "El correo electrónico o la contraseña son incorrectos.",
       })
     } finally {
       setLoading(false);
     }
-    */
-
-    // Simulate API call
-    setTimeout(() => {
-      // In a real app, you would handle authentication here
-      console.log('Intento de inicio de sesión con:', values.email);
-      // For now, we'll just navigate to the dashboard
-      router.push('/dashboard');
-    }, 1000);
   }
 
   return (
