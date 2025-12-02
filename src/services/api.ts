@@ -1,6 +1,8 @@
 'use client';
 // This file is intended to house all the backend API communication logic.
 
+import type { Alert } from "@/lib/types";
+
 const API_BASE_URL = 'http://localhost:9001';
 
 /**
@@ -42,6 +44,7 @@ export async function login(email: string, password: string): Promise<{ token: s
     });
   } catch (error) {
     console.log('no se encontro base de datos');
+    // throw new Error('no se encontro servidor');
     throw new Error('no se encontro servidor');
   }
 
@@ -63,4 +66,33 @@ export async function login(email: string, password: string): Promise<{ token: s
   }
 
   return { token, userId: String(userId) };
+}
+
+
+/**
+ * Fetches the list of alerts from the backend.
+ * @returns A promise that resolves to an array of alerts.
+ */
+export async function getAlerts(): Promise<Alert[]> {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
+
+  if (!token) {
+    throw new Error('No se encontró el token de autenticación.');
+  }
+
+  const response = await fetch(`${API_BASE_URL}/alert/`, {
+    method: 'GET',
+    headers: {
+      'accept': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({ message: 'Error al cargar las alertas.' }));
+    throw new Error(errorData.message || `Error ${response.status}: Falló la carga de alertas`);
+  }
+
+  const result = await response.json();
+  return result.data;
 }
