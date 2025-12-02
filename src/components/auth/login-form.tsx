@@ -33,6 +33,8 @@ export function LoginForm() {
     if (values.email === 'admin@aquaguard.com' && values.password === 'admin') {
       if (typeof window !== 'undefined') {
         localStorage.setItem('authToken', 'mock-admin-token');
+        // For testing purposes, let's set a mock user ID
+        localStorage.setItem('userId', '1');
       }
       toast({
         title: "Inicio de Sesión de Administrador",
@@ -44,10 +46,11 @@ export function LoginForm() {
     }
     
     try {
-      const { token } = await login(values.email, values.password);
+      const { token, userId } = await login(values.email, values.password);
       
       if (typeof window !== 'undefined') {
         localStorage.setItem('authToken', token);
+        localStorage.setItem('userId', userId);
       }
       
       toast({

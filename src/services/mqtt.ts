@@ -1,16 +1,11 @@
-// Este archivo está destinado a configurar y gestionar la conexión del cliente MQTT.
-// Debido al entorno de desarrollo, no es posible establecer una conexión MQTT real aquí.
-// En su lugar, hemos preparado el código para que pueda integrarlo fácilmente.
+'use client';
 
-// PASO 1: Instale la biblioteca MQTT
-// La dependencia 'mqtt' ya ha sido añadida a su package.json.
-// Simplemente ejecute `npm install` en su terminal para instalarla.
+// Este archivo está destinado a configurar y gestionar la conexión del cliente MQTT.
 
 import mqtt from 'mqtt';
 
-// PASO 2: Configure los detalles de su broker MQTT
-const MQTT_BROKER_URL = 'mqtt://localhost:1883'; // Reemplace con la URL de su broker
-const MQTT_TOPIC_PREFIX = 'devices/esp'; // Prefijo del topic para los dispositivos ESP
+// Configure los detalles de su broker MQTT
+const MQTT_BROKER_URL = 'ws://localhost:9003'; // Conexión a través de WebSocket
 
 /**
  * Representa los datos que se esperan de un dispositivo ESP.
@@ -23,21 +18,22 @@ export interface DeviceData {
 }
 
 /**
- * Función para conectar al broker MQTT y suscribirse a los topics.
+ * Función para conectar al broker MQTT y suscribirse a los topics dinámicos del usuario.
  * 
+ * @param userId - El ID del usuario para construir el topic.
  * @param onMessageCallback - Una función que se llamará cada vez que se reciba un mensaje.
  *                            Toma el topic y el payload (como objeto DeviceData) como argumentos.
  */
-export function connectToMqtt(onMessageCallback: (topic: string, data: DeviceData) => void) {
-  console.log('Intentando conectar al broker MQTT...');
+export function connectToMqtt(userId: string, onMessageCallback: (topic: string, data: DeviceData) => void) {
+  console.log(`Intentando conectar al broker MQTT en ${MQTT_BROKER_URL}...`);
 
   const client = mqtt.connect(MQTT_BROKER_URL);
 
   client.on('connect', () => {
     console.log('¡Conectado al broker MQTT!');
-    // Suscribirse a los topics de todos los dispositivos. 
-    // El wildcard '+' se usa para coincidir con cualquier ID de dispositivo.
-    const topicToSubscribe = `${MQTT_TOPIC_PREFIX}/+/data`;
+    // Suscribirse al topic dinámico del usuario.
+    // El wildcard '#' se usa para coincidir con todos los sub-topics de los dispositivos.
+    const topicToSubscribe = `${userId}/esp/#`;
     client.subscribe(topicToSubscribe, (err) => {
       if (!err) {
         console.log(`Suscrito exitosamente al topic: ${topicToSubscribe}`);
@@ -80,23 +76,3 @@ export function connectToMqtt(onMessageCallback: (topic: string, data: DeviceDat
   // por ejemplo, para publicar mensajes o cerrar la conexión manualmente.
   return client;
 }
-
-// Ejemplo de cómo podría usar esta función en un componente de React (por ejemplo, en su layout principal o proveedor de contexto):
-/*
-useEffect(() => {
-  const handleNewData = (topic, data) => {
-    // Aquí actualiza el estado de su aplicación con los nuevos datos.
-    // Puede usar un store de estado como Zustand, Redux, o el Context API de React.
-    console.log('Actualizando UI con:', data);
-  };
-
-  const mqttClient = connectToMqtt(handleNewData);
-
-  // Limpieza: asegúrese de cerrar la conexión cuando el componente se desmonte.
-  return () => {
-    if (mqttClient) {
-      mqttClient.end();
-    }
-  };
-}, []);
-*/

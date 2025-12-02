@@ -7,11 +7,9 @@ import { AlertsTable } from "@/components/dashboard/alerts-table";
 import { Waves, Thermometer, Gauge, AlertTriangle, Wifi, Bot } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState, useEffect } from "react";
-import { mockDeviceData, mockWeeklyWaterLevel } from "@/lib/mock-data";
-import { RiskAssessmentForm } from "@/components/dashboard/risk-assessment-form";
+import { mockWeeklyWaterLevel } from "@/lib/mock-data";
 import { connectToMqtt, type DeviceData } from "@/services/mqtt";
 import { type MqttClient } from "mqtt";
-
 
 type DeviceMetrics = {
     waterLevel: number;
@@ -31,26 +29,28 @@ const initialDeviceState: DeviceState = {
     weeklyData: mockWeeklyWaterLevel, // Weekly data can remain mock for now
 };
 
-const useMqttData = (devices: string[]) => {
+const useMqttData = (devices: { id: string; name: string }[]) => {
     const [data, setData] = useState<Record<string, DeviceState>>(() => {
         const initialState: Record<string, DeviceState> = {};
-        devices.forEach(deviceId => {
-            // Initialize with mock data structure to avoid undefined errors
-            initialState[deviceId] = {
-                currentMetrics: mockDeviceData[deviceId]?.currentMetrics || { waterLevel: 0, temperature: 0, pressure: 0 },
-                realtimeData: mockDeviceData[deviceId]?.realtimeData || [],
-                weeklyData: mockWeeklyWaterLevel,
-            };
+        devices.forEach(device => {
+            // Initialize with a default structure to avoid undefined errors
+            initialState[device.id] = { ...initialDeviceState };
         });
         return initialState;
     });
 
     useEffect(() => {
-        const handleNewData = (topic: string, message: DeviceData) => {
-            const topicParts = topic.split('/');
-            const deviceId = topicParts[2]; // e.g., 'devices/esp/esp001/data' -> 'esp001'
+        const userId = localStorage.getItem('userId');
+        if (!userId) {
+            console.error("User ID not found. MQTT connection not established.");
+            return;
+        }
 
-            if (devices.includes(deviceId)) {
+        const handleNewData = (topic: string, message: DeviceData) => {
+            const topicParts = topic.split('/'); // e.g., '1/esp/esp001/data'
+            const deviceId = topicParts[2];
+            
+            if (devices.some(d => d.id === deviceId)) {
                 setData(prevData => {
                     const deviceState = prevData[deviceId] || initialDeviceState;
                     const newPoint = {
@@ -59,7 +59,7 @@ const useMqttData = (devices: string[]) => {
                         temperature: message.temperature,
                         pressure: message.pressure,
                     };
-                    const newRealtimeData = [...deviceState.realtimeData, newPoint].slice(-20); // Keep last 20 points
+                    const newRealtimeData = [...deviceState.realtimeData, newPoint].slice(-20);
 
                     return {
                         ...prevData,
@@ -77,15 +77,14 @@ const useMqttData = (devices: string[]) => {
             }
         };
 
-        const mqttClient: MqttClient = connectToMqtt(handleNewData);
+        const mqttClient: MqttClient = connectToMqtt(userId, handleNewData);
 
-        // Cleanup on component unmount
         return () => {
             if (mqttClient) {
                 mqttClient.end();
             }
         };
-    }, [devices]); // Re-run effect if device list changes
+    }, [devices]);
 
     return data;
 };
@@ -95,11 +94,10 @@ const deviceList = [
     { id: 'esp002', name: 'Dispositivo Canal Getsemaní' },
     { id: 'esp003', name: 'Muelle Bocagrande' },
 ];
-const deviceIds = deviceList.map(d => d.id);
 
 export default function DashboardPage() {
-  const [selectedDevice, setSelectedDevice] = useState(deviceIds[0]);
-  const allDevicesData = useMqttData(deviceIds);
+  const [selectedDevice, setSelectedDevice] = useState(deviceList[0].id);
+  const allDevicesData = useMqttData(deviceList);
   const deviceData = allDevicesData[selectedDevice] || initialDeviceState;
 
   return (
