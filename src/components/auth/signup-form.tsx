@@ -7,8 +7,8 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { useState } from 'react';
-import { Loader2 } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { useToast } from '@/hooks/use-toast';
 
@@ -16,58 +16,104 @@ const formSchema = z.object({
   name: z.string().min(2, 'El nombre debe tener al menos 2 caracteres.'),
   email: z.string().email('Dirección de correo electrónico inválida.'),
   phonePrefix: z.string(),
-  phoneNumber: z.string().min(7, 'El número de teléfono debe tener al menos 7 dígitos.'),
+  phoneNumber: z.string().min(7, 'El número de teléfono debe tener al menos 7 dígitos.').regex(/^\d+$/, 'Solo se permiten números.'),
   password: z.string().min(6, 'La contraseña debe tener al menos 6 caracteres.'),
   confirmPassword: z.string().min(6, 'La contraseña debe tener al menos 6 caracteres.'),
-}).refine((data) => data.password === data.confirmPassword, {
+})
+.refine((data) => data.password === data.confirmPassword, {
   message: "Las contraseñas no coinciden",
   path: ["confirmPassword"],
+})
+.refine((data) => {
+    if (data.phonePrefix === '+57') {
+        return data.phoneNumber.startsWith('3') && data.phoneNumber.length === 10;
+    }
+    return true;
+    }, {
+    message: "Para Colombia (+57), el número debe empezar por 3 y tener 10 dígitos.",
+    path: ["phoneNumber"],
+})
+.refine((data) => {
+    if (data.phonePrefix === '+1') {
+        return data.phoneNumber.length === 10;
+    }
+    return true;
+    }, {
+    message: "Para USA (+1), el número debe tener 10 dígitos.",
+    path: ["phoneNumber"],
+})
+.refine((data) => {
+    if (data.phonePrefix === '+52') {
+        return data.phoneNumber.length === 10;
+    }
+    return true;
+    }, {
+    message: "Para México (+52), el número debe tener 10 dígitos.",
+    path: ["phoneNumber"],
 });
+
 
 export function SignupForm() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: { name: '', email: '', phonePrefix: '+57', phoneNumber: '', password: '', confirmPassword: '' },
   });
+  
+  const selectedPrefix = form.watch('phonePrefix');
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  const placeholder = useMemo(() => {
+    switch (selectedPrefix) {
+      case '+57':
+        return '3001234567';
+      case '+1':
+        return '2025550123';
+      case '+52':
+        return '5512345678';
+      default:
+        return 'Tu número de teléfono';
+    }
+  }, [selectedPrefix]);
+
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     setLoading(true);
     
-    fetch("http://localhost:9001/user/register", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(values),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Registration failed");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        console.log("Registration success:", data);
-        router.push("/dashboard");
-      })
-      .catch((error) => {
-        console.error("Registration error:", error);
-        // show toast or error message
-      })
-      .finally(() => {
-        setLoading(false);
+    try {
+      const response = await fetch("http://localhost:9001/user/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(values),
       });
-    
-    // Simulate API call
-    setTimeout(() => {
-      // In a real app, you would handle registration here
-      console.log(values);
-      router.push('/dashboard');
-    }, 1000);
+
+      if (!response.ok) {
+        // As requested, show a specific error message if registration fails
+        throw new Error("No se pudo registrar revise sus datos");
+      }
+
+      // Handle successful registration
+      toast({
+        title: "Registro Exitoso",
+        description: "¡Bienvenido a AquaGuard! Serás redirigido para iniciar sesión.",
+      });
+      router.push('/login');
+
+    } catch (error: any) {
+      console.error(error);
+      toast({
+        variant: "destructive",
+        title: "Falló el Registro",
+        description: error.message,
+      });
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -129,7 +175,7 @@ export function SignupForm() {
                 <FormItem className="w-2/3">
                 <FormLabel>Número de Teléfono</FormLabel>
                 <FormControl>
-                    <Input placeholder="3001234567" {...field} />
+                    <Input type="tel" inputMode='numeric' placeholder={placeholder} {...field} />
                 </FormControl>
                 <FormMessage />
                 </FormItem>
@@ -142,9 +188,21 @@ export function SignupForm() {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Contraseña</FormLabel>
-              <FormControl>
-                <Input type="password" placeholder="••••••••" {...field} />
-              </FormControl>
+              <div className="relative">
+                <FormControl>
+                  <Input type={showPassword ? "text" : "password"} placeholder="••••••••" {...field} />
+                </FormControl>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 text-muted-foreground"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <EyeOff /> : <Eye />}
+                  <span className="sr-only">{showPassword ? 'Ocultar' : 'Mostrar'} contraseña</span>
+                </Button>
+              </div>
               <FormMessage />
             </FormItem>
           )}
@@ -155,9 +213,21 @@ export function SignupForm() {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Confirmar Contraseña</FormLabel>
-              <FormControl>
-                <Input type="password" placeholder="••••••••" {...field} />
-              </FormControl>
+              <div className="relative">
+                <FormControl>
+                  <Input type={showConfirmPassword ? "text" : "password"} placeholder="••••••••" {...field} />
+                </FormControl>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 text-muted-foreground"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                >
+                  {showConfirmPassword ? <EyeOff /> : <Eye />}
+                  <span className="sr-only">{showConfirmPassword ? 'Ocultar' : 'Mostrar'} contraseña</span>
+                </Button>
+              </div>
               <FormMessage />
             </FormItem>
           )}
