@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { useToast } from '@/hooks/use-toast';
@@ -64,6 +64,21 @@ export function SignupForm() {
     resolver: zodResolver(formSchema),
     defaultValues: { name: '', email: '', phonePrefix: '+57', phoneNumber: '', password: '', confirmPassword: '' },
   });
+  
+  const selectedPrefix = form.watch('phonePrefix');
+
+  const placeholder = useMemo(() => {
+    switch (selectedPrefix) {
+      case '+57':
+        return '3001234567';
+      case '+1':
+        return '2025550123';
+      case '+52':
+        return '5512345678';
+      default:
+        return 'Tu número de teléfono';
+    }
+  }, [selectedPrefix]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setLoading(true);
@@ -160,7 +175,7 @@ export function SignupForm() {
                 <FormItem className="w-2/3">
                 <FormLabel>Número de Teléfono</FormLabel>
                 <FormControl>
-                    <Input type="tel" inputMode='numeric' placeholder="3001234567" {...field} />
+                    <Input type="tel" inputMode='numeric' placeholder={placeholder} {...field} />
                 </FormControl>
                 <FormMessage />
                 </FormItem>
