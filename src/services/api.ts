@@ -22,7 +22,7 @@ export async function login(email: string, password: string): Promise<{ token: s
   } catch (error) {
     // This will catch network errors (e.g., server is down)
     console.error('no se encontro base de datos');
-    throw new Error('no se encontro servidor');
+    // throw new Error('no se encontro servidor');
   }
 
 
