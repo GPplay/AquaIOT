@@ -100,9 +100,9 @@ export function SignupForm() {
       // Handle successful registration
       toast({
         title: "Registro Exitoso",
-        description: "¡Bienvenido a AquaGuard! Serás redirigido.",
+        description: "¡Bienvenido a AquaGuard! Serás redirigido para iniciar sesión.",
       });
-      router.push('/dashboard');
+      router.push('/login');
 
     } catch (error: any) {
       console.error(error);
