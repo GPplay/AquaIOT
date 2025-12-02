@@ -77,14 +77,15 @@ export async function getAlerts(): Promise<Alert[]> {
   const token = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
 
   if (!token) {
-    throw new Error('No se encontró el token de autenticación.');
+    // Return empty array if no token is found, as user might not be logged in.
+    return [];
   }
 
   const response = await fetch(`${API_BASE_URL}/alert/`, {
     method: 'GET',
     headers: {
       'accept': 'application/json',
-      'Authorization': `Bearer ${token}`,
+      'Authorization': `${token}`, // Assumes token is stored with "Bearer " prefix
     },
   });
 
@@ -95,4 +96,33 @@ export async function getAlerts(): Promise<Alert[]> {
 
   const result = await response.json();
   return result.data;
+}
+
+
+/**
+ * Marks an alert as checked.
+ * @param alertId The ID of the alert to mark as checked.
+ * @returns A promise that resolves to the updated alert.
+ */
+export async function checkAlert(alertId: number): Promise<Alert> {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
+    if (!token) {
+        throw new Error('No se encontró el token de autenticación.');
+    }
+
+    const response = await fetch(`${API_BASE_URL}/alert/${alertId}/check`, {
+        method: 'PUT',
+        headers: {
+            'accept': 'application/json',
+            'Authorization': `${token}`,
+        },
+    });
+
+    if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: 'Error al actualizar la alerta.' }));
+        throw new Error(errorData.message || `Error ${response.status}: Falló la actualización de la alerta`);
+    }
+
+    const result = await response.json();
+    return result.data;
 }

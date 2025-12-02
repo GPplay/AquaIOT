@@ -6,13 +6,12 @@ import Image from "next/image";
 import { Header } from "@/components/header";
 import Link from "next/link";
 import { usePathname } from 'next/navigation';
+import { AlertsProvider, useAlerts } from "@/hooks/use-alerts";
+import { Badge } from "@/components/ui/badge";
 
-export default function DashboardLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+function LayoutWithAlerts({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const { unreadCount } = useAlerts();
 
   const isActive = (path: string) => pathname === path || (path !== '/dashboard' && pathname.startsWith(path));
 
@@ -43,6 +42,9 @@ export default function DashboardLayout({
               <SidebarMenuButton as={Link} href="/dashboard/alerts" isActive={isActive('/dashboard/alerts')} tooltip="Alertas">
                 <Bell />
                 Alertas
+                {unreadCount > 0 && (
+                  <Badge variant="destructive" className="absolute right-2 top-1/2 -translate-y-1/2 h-5 w-5 justify-center p-0">{unreadCount}</Badge>
+                )}
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
@@ -70,4 +72,17 @@ export default function DashboardLayout({
       </SidebarInset>
     </SidebarProvider>
   );
+}
+
+
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+    return (
+        <AlertsProvider>
+            <LayoutWithAlerts>{children}</LayoutWithAlerts>
+        </AlertsProvider>
+    )
 }
