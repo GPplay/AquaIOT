@@ -30,7 +30,7 @@ export function LoginForm() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setLoading(true);
 
-    if (values.email === 'admin@aquaguard.com' && values.password === 'admin') {
+    if (values.email === 'admin@aquaguard.com' && values.password === 'admin123') {
       if (typeof window !== 'undefined') {
         localStorage.setItem('authToken', 'mock-admin-token');
         // For testing purposes, let's set a mock user ID
