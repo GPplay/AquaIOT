@@ -19,10 +19,39 @@ const formSchema = z.object({
   phoneNumber: z.string().min(7, 'El número de teléfono debe tener al menos 7 dígitos.').regex(/^\d+$/, 'Solo se permiten números.'),
   password: z.string().min(6, 'La contraseña debe tener al menos 6 caracteres.'),
   confirmPassword: z.string().min(6, 'La contraseña debe tener al menos 6 caracteres.'),
-}).refine((data) => data.password === data.confirmPassword, {
+})
+.refine((data) => data.password === data.confirmPassword, {
   message: "Las contraseñas no coinciden",
   path: ["confirmPassword"],
+})
+.refine((data) => {
+    if (data.phonePrefix === '+57') {
+        return data.phoneNumber.startsWith('3') && data.phoneNumber.length === 10;
+    }
+    return true;
+    }, {
+    message: "Para Colombia (+57), el número debe empezar por 3 y tener 10 dígitos.",
+    path: ["phoneNumber"],
+})
+.refine((data) => {
+    if (data.phonePrefix === '+1') {
+        return data.phoneNumber.length === 10;
+    }
+    return true;
+    }, {
+    message: "Para USA (+1), el número debe tener 10 dígitos.",
+    path: ["phoneNumber"],
+})
+.refine((data) => {
+    if (data.phonePrefix === '+52') {
+        return data.phoneNumber.length === 10;
+    }
+    return true;
+    }, {
+    message: "Para México (+52), el número debe tener 10 dígitos.",
+    path: ["phoneNumber"],
 });
+
 
 export function SignupForm() {
   const router = useRouter();
