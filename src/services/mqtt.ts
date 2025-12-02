@@ -9,7 +9,7 @@
 import mqtt from 'mqtt';
 
 // PASO 2: Configure los detalles de su broker MQTT
-const MQTT_BROKER_URL = 'mqtt://your_broker_address'; // Reemplace con la URL de su broker
+const MQTT_BROKER_URL = 'mqtt://localhost:1883'; // Reemplace con la URL de su broker
 const MQTT_TOPIC_PREFIX = 'devices/esp'; // Prefijo del topic para los dispositivos ESP
 
 /**
