@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useState } from 'react';
-import { Loader2 } from 'lucide-react';
+import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { useToast } from '@/hooks/use-toast';
 
@@ -16,7 +16,7 @@ const formSchema = z.object({
   name: z.string().min(2, 'El nombre debe tener al menos 2 caracteres.'),
   email: z.string().email('Dirección de correo electrónico inválida.'),
   phonePrefix: z.string(),
-  phoneNumber: z.string().min(7, 'El número de teléfono debe tener al menos 7 dígitos.'),
+  phoneNumber: z.string().min(7, 'El número de teléfono debe tener al menos 7 dígitos.').regex(/^\d+$/, 'Solo se permiten números.'),
   password: z.string().min(6, 'La contraseña debe tener al menos 6 caracteres.'),
   confirmPassword: z.string().min(6, 'La contraseña debe tener al menos 6 caracteres.'),
 }).refine((data) => data.password === data.confirmPassword, {
@@ -27,6 +27,8 @@ const formSchema = z.object({
 export function SignupForm() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -34,11 +36,9 @@ export function SignupForm() {
     defaultValues: { name: '', email: '', phonePrefix: '+57', phoneNumber: '', password: '', confirmPassword: '' },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     setLoading(true);
     
-    // To-do: Implement backend registration logic
-    /*
     try {
       const response = await fetch("/api/user/register", {
         method: "POST",
@@ -49,31 +49,27 @@ export function SignupForm() {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || `Error ${response.status}: Registration failed`);
+        // As requested, show a specific error message if registration fails
+        throw new Error("No se pudo registrar revise sus datos");
       }
 
       // Handle successful registration
+      toast({
+        title: "Registro Exitoso",
+        description: "¡Bienvenido a AquaGuard! Serás redirigido.",
+      });
       router.push('/dashboard');
 
     } catch (error: any) {
       console.error(error);
       toast({
         variant: "destructive",
-        title: "Registration Failed",
+        title: "Falló el Registro",
         description: error.message,
       });
     } finally {
       setLoading(false);
     }
-    */
-    
-    // Simulate API call
-    setTimeout(() => {
-      // In a real app, you would handle registration here
-      console.log(values);
-      router.push('/dashboard');
-    }, 1000);
   }
 
   return (
@@ -135,7 +131,7 @@ export function SignupForm() {
                 <FormItem className="w-2/3">
                 <FormLabel>Número de Teléfono</FormLabel>
                 <FormControl>
-                    <Input placeholder="3001234567" {...field} />
+                    <Input type="tel" inputMode='numeric' placeholder="3001234567" {...field} />
                 </FormControl>
                 <FormMessage />
                 </FormItem>
@@ -148,9 +144,21 @@ export function SignupForm() {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Contraseña</FormLabel>
-              <FormControl>
-                <Input type="password" placeholder="••••••••" {...field} />
-              </FormControl>
+              <div className="relative">
+                <FormControl>
+                  <Input type={showPassword ? "text" : "password"} placeholder="••••••••" {...field} />
+                </FormControl>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 text-muted-foreground"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <EyeOff /> : <Eye />}
+                  <span className="sr-only">{showPassword ? 'Ocultar' : 'Mostrar'} contraseña</span>
+                </Button>
+              </div>
               <FormMessage />
             </FormItem>
           )}
@@ -161,9 +169,21 @@ export function SignupForm() {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Confirmar Contraseña</FormLabel>
-              <FormControl>
-                <Input type="password" placeholder="••••••••" {...field} />
-              </FormControl>
+              <div className="relative">
+                <FormControl>
+                  <Input type={showConfirmPassword ? "text" : "password"} placeholder="••••••••" {...field} />
+                </FormControl>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 text-muted-foreground"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                >
+                  {showConfirmPassword ? <EyeOff /> : <Eye />}
+                  <span className="sr-only">{showConfirmPassword ? 'Ocultar' : 'Mostrar'} contraseña</span>
+                </Button>
+              </div>
               <FormMessage />
             </FormItem>
           )}
