@@ -25,6 +25,27 @@ function decodeJwt(token: string): { [key: string]: any } | null {
 }
 
 /**
+ * Decodes a JWT token to extract its payload.
+ * @param token The JWT token string.
+ * @returns The decoded payload object or null if decoding fails.
+ */
+function decodeJwt(token: string): { [key: string]: any } | null {
+  try {
+    const base64Url = token.split('.')[1];
+    if (!base64Url) return null;
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+
+    return JSON.parse(jsonPayload);
+  } catch (error) {
+    console.error("Failed to decode JWT:", error);
+    return null;
+  }
+}
+
+/**
  * Logs in a user by sending their credentials to the backend.
  * @param email The user's email.
  * @param password The user's password.
