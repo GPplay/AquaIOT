@@ -1,7 +1,28 @@
 'use client';
 // This file is intended to house all the backend API communication logic.
 
-const API_BASE_URL = 'http://localhost:9001/api';
+const API_BASE_URL = 'http://localhost:9001';
+
+/**
+ * Decodes a JWT token to extract its payload.
+ * @param token The JWT token string.
+ * @returns The decoded payload object or null if decoding fails.
+ */
+function decodeJwt(token: string): { [key: string]: any } | null {
+  try {
+    const base64Url = token.split('.')[1];
+    if (!base64Url) return null;
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+
+    return JSON.parse(jsonPayload);
+  } catch (error) {
+    console.error("Failed to decode JWT:", error);
+    return null;
+  }
+}
 
 /**
  * Decodes a JWT token to extract its payload.

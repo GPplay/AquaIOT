@@ -84,7 +84,7 @@ export function SignupForm() {
     setLoading(true);
     
     try {
-      const response = await fetch("/api/user/register", {
+      const response = await fetch("http://localhost:9001/user/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -33,7 +33,7 @@ export function connectToMqtt(userId: string, onMessageCallback: (topic: string,
     console.log('¡Conectado al broker MQTT!');
     // Suscribirse al topic dinámico del usuario.
     // El wildcard '#' se usa para coincidir con todos los sub-topics de los dispositivos.
-    const topicToSubscribe = `${userId}/esp/#`;
+    const topicToSubscribe = `${userId}/esp`;
     client.subscribe(topicToSubscribe, (err) => {
       if (!err) {
         console.log(`Suscrito exitosamente al topic: ${topicToSubscribe}`);
