@@ -20,8 +20,9 @@ export async function login(email: string, password: string): Promise<{ token: s
       body: JSON.stringify({ email, password }),
     });
   } catch (error) {
+    // This will catch network errors (e.g., server is down)
     console.error('Network error:', error);
-    throw new Error('No se pudo conectar con el servidor. Por favor, inténtalo más tarde.');
+    throw new Error('No hay servidores disponibles.');
   }
 
 
