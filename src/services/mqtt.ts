@@ -11,10 +11,10 @@ const MQTT_BROKER_URL = 'ws://localhost:9003'; // Conexión a través de WebSock
  * Representa los datos que se esperan de un dispositivo ESP.
  */
 export interface DeviceData {
-  waterLevel: number;
-  temperature: number;
-  pressure: number;
-  timestamp: string;
+  device_id: string;
+  level: number;
+  temp: number;
+  atm: number;
 }
 
 /**
@@ -33,7 +33,7 @@ export function connectToMqtt(userId: string, onMessageCallback: (topic: string,
     console.log('¡Conectado al broker MQTT!');
     // Suscribirse al topic dinámico del usuario.
     // El wildcard '#' se usa para coincidir con todos los sub-topics de los dispositivos.
-    const topicToSubscribe = `${userId}/esp`;
+    const topicToSubscribe = `${userId}/esp/#`;
     client.subscribe(topicToSubscribe, (err) => {
       if (!err) {
         console.log(`Suscrito exitosamente al topic: ${topicToSubscribe}`);

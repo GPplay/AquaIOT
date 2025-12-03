@@ -47,7 +47,10 @@ const useMqttData = (devices: { id: string; name: string }[]) => {
         }
 
         const handleNewData = (topic: string, message: DeviceData) => {
-            const topicParts = topic.split('/'); // e.g., '1/esp/esp001/data'
+            // The deviceId from the MQTT message payload should be used
+            // however the topic also includes deviceId, so we can use that instead.
+            // e.g., '1/esp/esp001'
+            const topicParts = topic.split('/'); 
             const deviceId = topicParts[2];
             
             if (devices.some(d => d.id === deviceId)) {
@@ -55,9 +58,9 @@ const useMqttData = (devices: { id: string; name: string }[]) => {
                     const deviceState = prevData[deviceId] || initialDeviceState;
                     const newPoint = {
                         time: new Date().toLocaleTimeString(),
-                        waterLevel: message.waterLevel,
-                        temperature: message.temperature,
-                        pressure: message.pressure,
+                        waterLevel: message.level,
+                        temperature: message.temp,
+                        pressure: message.atm,
                     };
                     const newRealtimeData = [...deviceState.realtimeData, newPoint].slice(-20);
 
