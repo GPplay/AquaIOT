@@ -1,7 +1,6 @@
 'use client';
 
 import { MetricCard } from "@/components/dashboard/metric-card";
-import { WaterLevelChart } from "@/components/dashboard/water-level-chart";
 import { RealtimeChart } from "@/components/dashboard/realtime-chart";
 import { AlertsTable } from "@/components/dashboard/alerts-table";
 import { Waves, Thermometer, Gauge } from "lucide-react";
@@ -140,8 +139,7 @@ export default function DashboardPage() {
         <MetricCard title="Temperatura" value={`${deviceData.currentMetrics.temperature.toFixed(1)}°C`} icon={<Thermometer className="h-5 w-5"/>} />
         <MetricCard title="Presión Atmosférica" value={`${deviceData.currentMetrics.pressure.toFixed(0)} hPa`} icon={<Gauge className="h-5 w-5"/>} />
       </div>
-      <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-        <WaterLevelChart data={deviceData.weeklyData} />
+      <div className="grid grid-cols-1 gap-6">
         <RealtimeChart data={deviceData.realtimeData} />
       </div>
       <div>
