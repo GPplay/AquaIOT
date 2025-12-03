@@ -6,13 +6,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AlertTriangle, CheckCircle2 } from "lucide-react";
-import { getAlerts, checkAlert } from "@/services/api";
+import { checkAlert } from "@/services/api";
 import { type Alert } from "@/lib/types";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { Button } from "../ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { useAlerts } from "@/hooks/use-alerts";
+import { useAlerts } from "@/hooks/use-alerts.tsx";
 
 const riskVariants: { [key: string]: 'default' | 'secondary' | 'destructive' | 'outline' | null | undefined } = {
   LOW: 'secondary',
@@ -99,7 +99,7 @@ export function AlertsTable() {
               ) : (
                 alerts.map((alert) => (
                   <TableRow key={alert.id} data-checked={alert.checked}>
-                    <TableCell className="font-medium">ALRT{String(alert.id).padStart(3, '0')}</TableCell>
+                    <TableCell className="font-medium">ALRT${String(alert.id).padStart(3, '0')}</TableCell>
                     <TableCell>
                       <Badge variant={riskVariants[alert.level]} className="capitalize">{alert.level.toLowerCase()}</Badge>
                     </TableCell>

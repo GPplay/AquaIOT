@@ -6,7 +6,7 @@ import Image from "next/image";
 import { Header } from "@/components/header";
 import Link from "next/link";
 import { usePathname } from 'next/navigation';
-import { AlertsProvider, useAlerts } from "@/hooks/use-alerts";
+import { AlertsProvider, useAlerts } from "@/hooks/use-alerts.tsx";
 import { Badge } from "@/components/ui/badge";
 
 function LayoutWithAlerts({ children }: { children: React.ReactNode }) {
