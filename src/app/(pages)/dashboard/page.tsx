@@ -4,12 +4,13 @@ import { MetricCard } from "@/components/dashboard/metric-card";
 import { WaterLevelChart } from "@/components/dashboard/water-level-chart";
 import { RealtimeChart } from "@/components/dashboard/realtime-chart";
 import { AlertsTable } from "@/components/dashboard/alerts-table";
-import { Waves, Thermometer, Gauge, AlertTriangle, Wifi, Bot } from "lucide-react";
+import { Waves, Thermometer, Gauge } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState, useEffect } from "react";
 import { mockWeeklyWaterLevel } from "@/lib/mock-data";
 import { connectToMqtt, type DeviceData } from "@/services/mqtt";
 import { type MqttClient } from "mqtt";
+import { Wifi } from "lucide-react";
 
 type DeviceMetrics = {
     waterLevel: number;
@@ -33,7 +34,6 @@ const useMqttData = (devices: { id: string; name: string }[]) => {
     const [data, setData] = useState<Record<string, DeviceState>>(() => {
         const initialState: Record<string, DeviceState> = {};
         devices.forEach(device => {
-            // Initialize with a default structure to avoid undefined errors
             initialState[device.id] = { ...initialDeviceState };
         });
         return initialState;
@@ -46,18 +46,14 @@ const useMqttData = (devices: { id: string; name: string }[]) => {
             return;
         }
 
-        const handleNewData = (topic: string, message: DeviceData) => {
-            // The deviceId from the MQTT message payload should be used
-            // however the topic also includes deviceId, so we can use that instead.
-            // e.g., '1/esp/esp001'
-            const topicParts = topic.split('/'); 
-            const deviceId = topicParts[2];
+        const handleNewData = (_topic: string, message: DeviceData) => {
+            const deviceId = message.device_id;
             
             if (devices.some(d => d.id === deviceId)) {
                 setData(prevData => {
-                    const deviceState = prevData[deviceId] || initialDeviceState;
+                    const deviceState = prevData[deviceId] || { ...initialDeviceState };
                     const newPoint = {
-                        time: new Date().toLocaleTimeString(),
+                        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
                         waterLevel: message.level,
                         temperature: message.temp,
                         pressure: message.atm,
