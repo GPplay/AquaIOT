@@ -43,6 +43,7 @@ export function RealtimeChart({ data }: { data: any[] }) {
                 yAxisId="left"
                 type="monotone"
                 dataKey="waterLevel"
+                name="Nivel Agua (m)"
                 stroke="hsl(var(--chart-1))"
                 strokeWidth={2}
                 dot={false}
@@ -51,6 +52,7 @@ export function RealtimeChart({ data }: { data: any[] }) {
                 yAxisId="right"
                 type="monotone"
                 dataKey="temperature"
+                name="Temp (°C)"
                 stroke="hsl(var(--chart-2))"
                 strokeWidth={2}
                 dot={false}
@@ -59,10 +61,10 @@ export function RealtimeChart({ data }: { data: any[] }) {
                 yAxisId="right"
                 type="monotone"
                 dataKey="pressure"
+                name="Presión (hPa)"
                 stroke="hsl(var(--chart-3))"
                 strokeWidth={2}
                 dot={false}
-                hide
               />
             </LineChart>
           </ResponsiveContainer>
