@@ -84,7 +84,7 @@ export async function getAlerts(): Promise<Alert[]> {
     method: 'GET',
     headers: {
       'accept': 'application/json',
-      'Authorization': `${token}`, // Assumes token is stored with "Bearer " prefix
+      'Authorization': `Bearer ${token}`, // Assumes token is stored with "Bearer " prefix
     },
   });
 
@@ -113,7 +113,7 @@ export async function checkAlert(alertId: number): Promise<Alert> {
         method: 'PUT',
         headers: {
             'accept': 'application/json',
-            'Authorization': `${token}`,
+            'Authorization': `Bearer ${token}`,
         },
     });
 
@@ -145,7 +145,7 @@ export async function getDevices() {
             method: 'GET',
             headers: {
                 'accept': 'application/json',
-                'Authorization': `${token}`,
+                'Authorization': `Bearer ${token}`,
             },
         });
     } catch (error) {
@@ -167,7 +167,7 @@ export async function addDevice(deviceData: { id: string; name: string; address:
         method: 'POST',
         headers: {
             'accept': 'application/json',
-            'Authorization': `${token}`,
+            'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
         },
         body: JSON.stringify(deviceData),
@@ -186,7 +186,7 @@ export async function updateDevice(macAddress: string, deviceData: { name: strin
         method: 'PUT',
         headers: {
             'accept': 'application/json',
-            'Authorization': `${token}`,
+            'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
         },
         body: JSON.stringify(deviceData),
@@ -204,7 +204,7 @@ export async function deleteDevice(macAddress: string) {
         method: 'DELETE',
         headers: {
             'accept': 'application/json',
-            'Authorization': `${token}`,
+            'Authorization': `Bearer ${token}`,
         },
     });
     if (!response.ok) {
