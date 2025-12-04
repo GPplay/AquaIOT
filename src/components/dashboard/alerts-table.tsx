@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
@@ -20,10 +20,23 @@ const riskVariants: { [key: string]: 'default' | 'secondary' | 'destructive' | '
   HIGH: 'destructive',
 };
 
-export function AlertsTable() {
+interface AlertsTableProps {
+  filterByDeviceId?: string;
+  title?: string;
+  description?: string;
+}
+
+export function AlertsTable({ filterByDeviceId, title = "Alertas Recientes", description = "Un registro de las alertas de riesgo de inundación recientes." }: AlertsTableProps) {
   const { alerts, setAlerts, loading, error } = useAlerts();
   const [updatingId, setUpdatingId] = useState<number | null>(null);
   const { toast } = useToast();
+
+  const filteredAlerts = useMemo(() => {
+    if (!filterByDeviceId) {
+      return alerts;
+    }
+    return alerts.filter(alert => alert.device_id === filterByDeviceId);
+  }, [alerts, filterByDeviceId]);
 
   const handleCheckAlert = async (alertId: number) => {
     setUpdatingId(alertId);
@@ -52,8 +65,8 @@ export function AlertsTable() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Alertas Recientes</CardTitle>
-        <CardDescription>Un registro de las alertas de riesgo de inundación recientes emitidas por el sistema.</CardDescription>
+        <CardTitle>{title}</CardTitle>
+        <CardDescription>{description}</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="relative w-full overflow-auto">
@@ -90,14 +103,14 @@ export function AlertsTable() {
                     </div>
                   </TableCell>
                 </TableRow>
-              ) : alerts.length === 0 ? (
+              ) : filteredAlerts.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
-                    No hay alertas para mostrar.
+                    No hay alertas para mostrar {filterByDeviceId ? "para este dispositivo" : ""}.
                   </TableCell>
                 </TableRow>
               ) : (
-                alerts.map((alert) => (
+                filteredAlerts.map((alert) => (
                   <TableRow key={alert.id} data-checked={alert.checked}>
                     <TableCell className="font-medium">ALRT${String(alert.id).padStart(3, '0')}</TableCell>
                     <TableCell>

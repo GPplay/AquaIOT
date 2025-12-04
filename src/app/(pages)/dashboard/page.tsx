@@ -143,7 +143,11 @@ export default function DashboardPage() {
         <RealtimeChart data={deviceData.realtimeData} />
       </div>
       <div>
-        <AlertsTable />
+        <AlertsTable 
+            filterByDeviceId={selectedDevice?.macAddress}
+            title={`Alertas para ${selectedDevice?.name}`}
+            description="Alertas de riesgo de inundación recientes para el dispositivo seleccionado."
+        />
       </div>
     </div>
   );

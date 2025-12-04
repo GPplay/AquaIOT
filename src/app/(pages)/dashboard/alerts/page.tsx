@@ -6,10 +6,13 @@ export default function AlertsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="font-headline text-3xl font-semibold">Historial de Alertas</h1>
-          <p className="text-muted-foreground">Navega a través de todas las alertas de riesgo de inundación pasadas.</p>
+          <p className="text-muted-foreground">Navega a través de todas las alertas de riesgo de inundación pasadas de todos tus dispositivos.</p>
         </div>
       </div>
-      <AlertsTable />
+      <AlertsTable 
+        title="Todas las Alertas"
+        description="Un registro de todas las alertas de riesgo de inundación recientes emitidas por el sistema."
+      />
     </div>
   );
 }
