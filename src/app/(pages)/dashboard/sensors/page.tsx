@@ -7,9 +7,6 @@ import { PlusCircle } from "lucide-react";
 import { useState, useCallback } from "react";
 
 export default function SensorsPage() {
-  // Dummy state and function to pass to SensorsTable.
-  // The actual device list is managed inside DashboardPage for the dropdown.
-  // This could be lifted to a shared context if needed across more pages.
   const [devices, setDevices] = useState<any[]>([]);
   const handleDevicesLoaded = useCallback((loadedDevices: any[]) => {
     setDevices(loadedDevices);

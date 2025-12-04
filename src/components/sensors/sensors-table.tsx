@@ -54,7 +54,7 @@ export function SensorsTable({ onDevicesLoaded }: { onDevicesLoaded: (devices: S
         } finally {
             setLoading(false);
         }
-    }, [toast, onDevicesLoaded]);
+    }, [onDevicesLoaded]);
 
     useEffect(() => {
         fetchDevices();
