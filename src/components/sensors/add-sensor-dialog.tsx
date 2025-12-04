@@ -14,8 +14,8 @@ import { addDevice } from '@/services/api';
 
 const formSchema = z.object({
   name: z.string().min(3, 'El nombre debe tener al menos 3 caracteres.'),
-  area: z.string().min(3, 'La ubicación debe tener al menos 3 caracteres.'),
-  macAddress: z.string().regex(/^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/, 'La dirección MAC no es válida.'),
+  address: z.string().min(3, 'La ubicación debe tener al menos 3 caracteres.'),
+  id: z.string().regex(/^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/, 'La dirección MAC no es válida.'),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -29,8 +29,8 @@ export function AddSensorDialog({ children, onDeviceAdded }: { children: React.R
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: '',
-      area: '',
-      macAddress: '',
+      address: '',
+      id: '',
     },
   });
 
@@ -85,12 +85,12 @@ export function AddSensorDialog({ children, onDeviceAdded }: { children: React.R
             />
             <FormField
               control={form.control}
-              name="area"
+              name="address"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Ubicación / Área</FormLabel>
+                  <FormLabel>Ubicación / Dirección</FormLabel>
                   <FormControl>
-                    <Input placeholder="Ej: Barrio Chino" {...field} />
+                    <Input placeholder="Ej: Nelson Mandela" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -98,10 +98,10 @@ export function AddSensorDialog({ children, onDeviceAdded }: { children: React.R
             />
             <FormField
               control={form.control}
-              name="macAddress"
+              name="id"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Dirección MAC del ESP</FormLabel>
+                  <FormLabel>Dirección MAC del ESP (ID)</FormLabel>
                   <FormControl>
                     <Input placeholder="00:1B:44:11:3A:B7" {...field} />
                   </FormControl>

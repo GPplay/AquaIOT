@@ -161,7 +161,7 @@ export async function getDevices() {
     return result.data;
 }
 
-export async function addDevice(deviceData: { name: string; area: string; macAddress: string }) {
+export async function addDevice(deviceData: { id: string; name: string; address: string; }) {
     const token = await getAuthToken();
     const response = await fetch(`${API_BASE_URL}/device/`, {
         method: 'POST',
@@ -180,7 +180,7 @@ export async function addDevice(deviceData: { name: string; area: string; macAdd
     return result.data;
 }
 
-export async function updateDevice(macAddress: string, deviceData: { name: string; area: string }) {
+export async function updateDevice(macAddress: string, deviceData: { name: string; address: string }) {
     const token = await getAuthToken();
     const response = await fetch(`${API_BASE_URL}/device/${macAddress}`, {
         method: 'PUT',

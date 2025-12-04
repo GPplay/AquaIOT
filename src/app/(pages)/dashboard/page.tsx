@@ -12,7 +12,7 @@ import { getDevices } from "@/services/api";
 import { Skeleton } from "@/components/ui/skeleton";
 
 type Device = {
-  id: string; // Internal ID if any, otherwise macAddress can be used
+  id: string; // This is the macAddress
   name: string;
   macAddress: string;
 };
@@ -99,9 +99,9 @@ export default function DashboardPage() {
     try {
         const devicesFromApi = await getDevices();
         const formattedDevices: Device[] = devicesFromApi.map((d: any) => ({
-          id: d.macAddress,
+          id: d.id, // The API returns 'id' as the mac address
           name: d.name,
-          macAddress: d.macAddress,
+          macAddress: d.id,
         }));
         setDeviceList(formattedDevices);
         if (formattedDevices.length > 0 && !selectedDeviceId) {
@@ -121,7 +121,7 @@ export default function DashboardPage() {
   const allDevicesData = useMqttData(deviceList);
   const deviceData = (selectedDeviceId && allDevicesData[selectedDeviceId]) || initialDeviceState;
   
-  const selectedDevice = useMemo(() => deviceList.find(d => d.id === selectedDeviceId), [selectedDeviceId, deviceList]);
+  const selectedDevice = useMemo(() => deviceList.find(d => d.macAddress === selectedDeviceId), [selectedDeviceId, deviceList]);
 
   return (
     <div className="flex flex-col gap-6">
@@ -144,7 +144,7 @@ export default function DashboardPage() {
                         </SelectTrigger>
                         <SelectContent>
                             {deviceList.map(device => (
-                                <SelectItem key={device.id} value={device.id}>{device.name}</SelectItem>
+                                <SelectItem key={device.id} value={device.macAddress}>{device.name}</SelectItem>
                             ))}
                         </SelectContent>
                     </Select>

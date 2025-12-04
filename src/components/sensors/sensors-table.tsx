@@ -23,7 +23,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 
-type Sensor = { name: string; area: string; macAddress: string; status: 'online' | 'offline' };
+type Sensor = { name: string; address: string; macAddress: string; status: 'online' | 'offline' };
 
 const statusConfig: { [key: string]: { variant: 'default' | 'secondary' | 'destructive' | 'outline' | null | undefined, icon: React.ReactNode, label: string } } = {
   online: { variant: 'default', icon: <Wifi className="h-3 w-3" />, label: 'En línea' },
@@ -41,8 +41,12 @@ export function SensorsTable({ onDevicesLoaded }: { onDevicesLoaded: (devices: S
         setError(null);
         try {
             const data = await getDevices();
-            // Assuming the API returns devices with a status property. If not, we might need to derive it.
-            const formattedData = data.map((d: any) => ({ ...d, status: d.status || 'offline' }));
+            const formattedData: Sensor[] = data.map((d: any) => ({ 
+                macAddress: d.id, 
+                name: d.name,
+                address: d.address,
+                status: d.status === 'ON' ? 'online' : 'offline'
+            }));
             setSensors(formattedData);
             onDevicesLoaded(formattedData);
         } catch (err: any) {
@@ -123,7 +127,7 @@ export function SensorsTable({ onDevicesLoaded }: { onDevicesLoaded: (devices: S
                     <TableRow key={sensor.macAddress}>
                     <TableCell className="font-mono text-xs">{sensor.macAddress}</TableCell>
                     <TableCell className="font-medium">{sensor.name}</TableCell>
-                    <TableCell>{sensor.area}</TableCell>
+                    <TableCell>{sensor.address}</TableCell>
                     <TableCell>
                         <Badge variant={statusConfig[sensor.status]?.variant || 'secondary'} className="capitalize gap-1.5">
                             {statusConfig[sensor.status]?.icon || <WifiOff className="h-3 w-3" />}

@@ -14,13 +14,13 @@ import { updateDevice } from '@/services/api';
 
 const formSchema = z.object({
   name: z.string().min(3, 'El nombre debe tener al menos 3 caracteres.'),
-  area: z.string().min(3, 'La ubicación debe tener al menos 3 caracteres.'),
+  address: z.string().min(3, 'La ubicación debe tener al menos 3 caracteres.'),
 });
 
 type FormValues = z.infer<typeof formSchema>;
 
 interface EditSensorDialogProps {
-  sensor: { name: string; area: string; macAddress: string; };
+  sensor: { name: string; address: string; macAddress: string; };
   onUpdate: () => void;
   children: React.ReactNode;
 }
@@ -34,7 +34,7 @@ export function EditSensorDialog({ sensor, onUpdate, children }: EditSensorDialo
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: sensor.name,
-      area: sensor.area,
+      address: sensor.address,
     },
   });
 
@@ -42,7 +42,7 @@ export function EditSensorDialog({ sensor, onUpdate, children }: EditSensorDialo
     if (open) {
       form.reset({
           name: sensor.name,
-          area: sensor.area,
+          address: sensor.address,
       });
     }
   }, [open, sensor, form]);
@@ -97,12 +97,12 @@ export function EditSensorDialog({ sensor, onUpdate, children }: EditSensorDialo
             />
             <FormField
               control={form.control}
-              name="area"
+              name="address"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Ubicación / Área</FormLabel>
+                  <FormLabel>Ubicación / Dirección</FormLabel>
                   <FormControl>
-                    <Input placeholder="Ej: Barrio Chino" {...field} />
+                    <Input placeholder="Ej: Nelson Mandela" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
