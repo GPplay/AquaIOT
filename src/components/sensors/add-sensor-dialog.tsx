@@ -10,6 +10,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { addDevice } from '@/services/api';
 
 const formSchema = z.object({
   name: z.string().min(3, 'El nombre debe tener al menos 3 caracteres.'),
@@ -19,7 +20,7 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
-export function AddSensorDialog({ children }: { children: React.ReactNode }) {
+export function AddSensorDialog({ children, onDeviceAdded }: { children: React.ReactNode, onDeviceAdded: () => void }) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
@@ -35,16 +36,24 @@ export function AddSensorDialog({ children }: { children: React.ReactNode }) {
 
   const onSubmit = async (values: FormValues) => {
     setLoading(true);
-    // Simulate API call to add a sensor
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    console.log('Nuevo dispositivo añadido:', values);
-    setLoading(false);
-    setOpen(false);
-    form.reset();
-    toast({
-        title: "Dispositivo Añadido",
-        description: `El dispositivo "${values.name}" ha sido añadido correctamente.`,
-    })
+    try {
+        await addDevice(values);
+        toast({
+            title: "Dispositivo Añadido",
+            description: `El dispositivo "${values.name}" ha sido añadido correctamente.`,
+        });
+        onDeviceAdded();
+        setLoading(false);
+        setOpen(false);
+        form.reset();
+    } catch (error: any) {
+        setLoading(false);
+        toast({
+            variant: "destructive",
+            title: "Error",
+            description: error.message || 'No se pudo añadir el dispositivo.',
+        });
+    }
   };
 
   return (

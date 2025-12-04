@@ -10,18 +10,18 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { updateDevice } from '@/services/api';
 
 const formSchema = z.object({
   name: z.string().min(3, 'El nombre debe tener al menos 3 caracteres.'),
   area: z.string().min(3, 'La ubicación debe tener al menos 3 caracteres.'),
-  macAddress: z.string(), // Not for editing, just for display
 });
 
 type FormValues = z.infer<typeof formSchema>;
 
 interface EditSensorDialogProps {
   sensor: { name: string; area: string; macAddress: string; };
-  onUpdate: (updatedSensor: { name: string; area: string; macAddress: string; }) => void;
+  onUpdate: () => void;
   children: React.ReactNode;
 }
 
@@ -35,30 +35,37 @@ export function EditSensorDialog({ sensor, onUpdate, children }: EditSensorDialo
     defaultValues: {
       name: sensor.name,
       area: sensor.area,
-      macAddress: sensor.macAddress,
     },
   });
 
   useEffect(() => {
     if (open) {
-      form.reset(sensor);
+      form.reset({
+          name: sensor.name,
+          area: sensor.area,
+      });
     }
   }, [open, sensor, form]);
 
   const onSubmit = async (values: FormValues) => {
     setLoading(true);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Call the parent update function
-    onUpdate({ ...sensor, ...values });
-
-    setLoading(false);
-    setOpen(false);
-    toast({
-        title: "Dispositivo Actualizado",
-        description: `El dispositivo "${values.name}" ha sido actualizado correctamente.`,
-    });
+    try {
+        await updateDevice(sensor.macAddress, values);
+        toast({
+            title: "Dispositivo Actualizado",
+            description: `El dispositivo "${values.name}" ha sido actualizado correctamente.`,
+        });
+        onUpdate();
+        setLoading(false);
+        setOpen(false);
+    } catch (error: any) {
+        setLoading(false);
+        toast({
+            variant: "destructive",
+            title: "Error",
+            description: error.message || 'No se pudo actualizar el dispositivo.',
+        });
+    }
   };
 
   return (

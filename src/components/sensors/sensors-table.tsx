@@ -5,35 +5,77 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from "../ui/dropdown-menu";
 import { Button } from "../ui/button";
-import { MoreHorizontal, Trash2, Edit, Wifi, WifiOff } from "lucide-react";
-import { useState } from "react";
+import { MoreHorizontal, Trash2, Edit, Wifi, WifiOff, AlertTriangle } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
 import { EditSensorDialog } from "./edit-sensor-dialog";
+import { getDevices, deleteDevice } from "@/services/api";
+import { useToast } from "@/hooks/use-toast";
+import { Skeleton } from "../ui/skeleton";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 
 type Sensor = { name: string; area: string; macAddress: string; status: 'online' | 'offline' };
-
-const initialSensors: Sensor[] = [
-  { name: 'Dispositivo Boca del Río', area: 'Barrio Chino', macAddress: '3C:71:BF:4C:4C:AC', status: 'online' },
-  { name: 'Dispositivo Canal Getsemaní', area: 'Getsemaní', macAddress: '84:0D:8E:95:5E:28', status: 'online' },
-  { name: 'Muelle Bocagrande', area: 'Bocagrande', macAddress: 'A0:20:A6:10:4E:5A', status: 'offline' },
-  { name: 'Puente El Pozón', area: 'El Pozón', macAddress: 'BC:DD:C2:72:A4:9C', status: 'online' },
-  { name: 'Bahía de Manga', area: 'Manga', macAddress: '40:F5:20:41:A7:B0', status: 'offline' },
-  { name: 'Laguna del Cabrero', area: 'Marbella', macAddress: 'CC:50:E3:8A:A8:B4', status: 'online' },
-];
 
 const statusConfig: { [key: string]: { variant: 'default' | 'secondary' | 'destructive' | 'outline' | null | undefined, icon: React.ReactNode, label: string } } = {
   online: { variant: 'default', icon: <Wifi className="h-3 w-3" />, label: 'En línea' },
   offline: { variant: 'destructive', icon: <WifiOff className="h-3 w-3" />, label: 'Fuera de línea' },
 };
 
-export function SensorsTable() {
-    const [sensors, setSensors] = useState<Sensor[]>(initialSensors);
+export function SensorsTable({ onDevicesLoaded }: { onDevicesLoaded: (devices: Sensor[]) => void }) {
+    const [sensors, setSensors] = useState<Sensor[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const { toast } = useToast();
 
-    const handleDelete = (macAddress: string) => {
-        setSensors(sensors.filter(sensor => sensor.macAddress !== macAddress));
-    }
+    const fetchDevices = useCallback(async () => {
+        setLoading(true);
+        setError(null);
+        try {
+            const data = await getDevices();
+            // Assuming the API returns devices with a status property. If not, we might need to derive it.
+            const formattedData = data.map((d: any) => ({ ...d, status: d.status || 'offline' }));
+            setSensors(formattedData);
+            onDevicesLoaded(formattedData);
+        } catch (err: any) {
+            setError(err.message || "No se pudieron cargar los dispositivos.");
+            toast({
+                variant: "destructive",
+                title: "Error de Carga",
+                description: err.message,
+            });
+        } finally {
+            setLoading(false);
+        }
+    }, [toast, onDevicesLoaded]);
 
-    const handleUpdate = (updatedSensor: Sensor) => {
-        setSensors(sensors.map(sensor => sensor.macAddress === updatedSensor.macAddress ? updatedSensor : sensor));
+    useEffect(() => {
+        fetchDevices();
+    }, [fetchDevices]);
+
+    const handleDelete = async (macAddress: string) => {
+        try {
+            await deleteDevice(macAddress);
+            toast({
+                title: "Dispositivo Eliminado",
+                description: `El dispositivo con MAC ${macAddress} ha sido eliminado.`,
+            });
+            fetchDevices(); // Refresh list
+        } catch (err: any) {
+            toast({
+                variant: "destructive",
+                title: "Error al Eliminar",
+                description: err.message,
+            });
+        }
     }
 
   return (
@@ -55,41 +97,88 @@ export function SensorsTable() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {sensors.map((sensor) => (
-                <TableRow key={sensor.macAddress}>
-                  <TableCell className="font-mono text-xs">{sensor.macAddress}</TableCell>
-                  <TableCell className="font-medium">{sensor.name}</TableCell>
-                  <TableCell>{sensor.area}</TableCell>
-                  <TableCell>
-                    <Badge variant={statusConfig[sensor.status]?.variant} className="capitalize gap-1.5">
-                        {statusConfig[sensor.status]?.icon}
-                        {statusConfig[sensor.status]?.label}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                                <MoreHorizontal />
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                            <EditSensorDialog sensor={sensor} onUpdate={handleUpdate}>
-                                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                                    <Edit className="mr-2" />
-                                    Editar
-                                </DropdownMenuItem>
-                            </EditSensorDialog>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem className="text-destructive" onClick={() => handleDelete(sensor.macAddress)}>
-                                <Trash2 className="mr-2" />
-                                Eliminar
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+              {loading ? (
+                Array.from({ length: 3 }).map((_, index) => (
+                    <TableRow key={index}>
+                        <TableCell><Skeleton className="h-4 w-32" /></TableCell>
+                        <TableCell><Skeleton className="h-4 w-40" /></TableCell>
+                        <TableCell><Skeleton className="h-4 w-24" /></TableCell>
+                        <TableCell><Skeleton className="h-6 w-24 rounded-full" /></TableCell>
+                        <TableCell className="text-right"><Skeleton className="h-8 w-8 ml-auto rounded-full" /></TableCell>
+                    </TableRow>
+                ))
+              ) : error ? (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center text-destructive py-8">
+                    <div className="flex flex-col items-center gap-2">
+                        <AlertTriangle className="h-8 w-8" />
+                        <p className="font-semibold">Error al cargar los dispositivos</p>
+                        <p className="text-sm text-muted-foreground">{error}</p>
+                    </div>
                   </TableCell>
                 </TableRow>
-              ))}
+              ) : sensors.length === 0 ? (
+                <TableRow>
+                    <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                        No se han encontrado dispositivos. Añade uno para empezar.
+                    </TableCell>
+                </TableRow>
+              ) : (
+                sensors.map((sensor) => (
+                    <TableRow key={sensor.macAddress}>
+                    <TableCell className="font-mono text-xs">{sensor.macAddress}</TableCell>
+                    <TableCell className="font-medium">{sensor.name}</TableCell>
+                    <TableCell>{sensor.area}</TableCell>
+                    <TableCell>
+                        <Badge variant={statusConfig[sensor.status]?.variant || 'secondary'} className="capitalize gap-1.5">
+                            {statusConfig[sensor.status]?.icon || <WifiOff className="h-3 w-3" />}
+                            {statusConfig[sensor.status]?.label || 'Desconocido'}
+                        </Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
+                        <AlertDialog>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" size="icon">
+                                        <MoreHorizontal />
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                    <EditSensorDialog sensor={sensor} onUpdate={fetchDevices}>
+                                        <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                                            <Edit className="mr-2" />
+                                            Editar
+                                        </DropdownMenuItem>
+                                    </EditSensorDialog>
+                                    <DropdownMenuSeparator />
+                                    <AlertDialogTrigger asChild>
+                                        <DropdownMenuItem className="text-destructive" onSelect={(e) => e.preventDefault()}>
+                                            <Trash2 className="mr-2" />
+                                            Eliminar
+                                        </DropdownMenuItem>
+                                    </AlertDialogTrigger>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                    Esta acción no se puede deshacer. Esto eliminará permanentemente el dispositivo
+                                    y todos sus datos asociados.
+                                </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => handleDelete(sensor.macAddress)}>
+                                    Sí, eliminar dispositivo
+                                </AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
+                    </TableCell>
+                    </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         </div>

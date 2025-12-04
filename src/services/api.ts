@@ -126,3 +126,83 @@ export async function checkAlert(alertId: number): Promise<Alert> {
     const result = await response.json();
     return result.data;
 }
+
+
+// Device Management API functions
+
+async function getAuthToken() {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
+    if (!token) {
+        throw new Error('No se encontró el token de autenticación.');
+    }
+    return token;
+}
+
+export async function getDevices() {
+    const token = await getAuthToken();
+    const response = await fetch(`${API_BASE_URL}/device/`, {
+        method: 'GET',
+        headers: {
+            'accept': 'application/json',
+            'Authorization': `${token}`,
+        },
+    });
+    if (!response.ok) {
+        throw new Error('Error al obtener los dispositivos.');
+    }
+    const result = await response.json();
+    return result.data;
+}
+
+export async function addDevice(deviceData: { name: string; area: string; macAddress: string }) {
+    const token = await getAuthToken();
+    const response = await fetch(`${API_BASE_URL}/device/`, {
+        method: 'POST',
+        headers: {
+            'accept': 'application/json',
+            'Authorization': `${token}`,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(deviceData),
+    });
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Error al añadir el dispositivo.');
+    }
+    const result = await response.json();
+    return result.data;
+}
+
+export async function updateDevice(macAddress: string, deviceData: { name: string; area: string }) {
+    const token = await getAuthToken();
+    const response = await fetch(`${API_BASE_URL}/device/${macAddress}`, {
+        method: 'PUT',
+        headers: {
+            'accept': 'application/json',
+            'Authorization': `${token}`,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(deviceData),
+    });
+    if (!response.ok) {
+        throw new Error('Error al actualizar el dispositivo.');
+    }
+    const result = await response.json();
+    return result.data;
+}
+
+export async function deleteDevice(macAddress: string) {
+    const token = await getAuthToken();
+    const response = await fetch(`${API_BASE_URL}/device/${macAddress}`, {
+        method: 'DELETE',
+        headers: {
+            'accept': 'application/json',
+            'Authorization': `${token}`,
+        },
+    });
+    if (!response.ok) {
+        throw new Error('Error al eliminar el dispositivo.');
+    }
+    const result = await response.json();
+    return result.data;
+}
