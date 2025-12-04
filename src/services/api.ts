@@ -158,7 +158,7 @@ export async function getDevices() {
         throw new Error(errorData.message || 'Error al obtener los dispositivos.');
     }
     const result = await response.json();
-    return result.data;
+    return result;
 }
 
 export async function addDevice(deviceData: { id: string; name: string; address: string; }) {
