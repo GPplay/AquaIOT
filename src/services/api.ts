@@ -43,9 +43,8 @@ export async function login(email: string, password: string): Promise<{ token: s
       body: JSON.stringify({ email, password }),
     });
   } catch (error) {
-    console.log('no se encontro base de datos');
-    // throw new Error('no se encontro servidor');
-    throw new Error('no se encontro servidor');
+    console.error("Connection error during login:", error);
+    throw new Error('No se pudo conectar con el servidor.');
   }
 
   if (!response.ok) {
@@ -140,15 +139,23 @@ async function getAuthToken() {
 
 export async function getDevices() {
     const token = await getAuthToken();
-    const response = await fetch(`${API_BASE_URL}/device/`, {
-        method: 'GET',
-        headers: {
-            'accept': 'application/json',
-            'Authorization': `${token}`,
-        },
-    });
+    let response;
+    try {
+        response = await fetch(`${API_BASE_URL}/device/`, {
+            method: 'GET',
+            headers: {
+                'accept': 'application/json',
+                'Authorization': `${token}`,
+            },
+        });
+    } catch (error) {
+        console.error("Connection error fetching devices:", error);
+        throw new Error("No se pudo conectar con el servidor.");
+    }
+
     if (!response.ok) {
-        throw new Error('Error al obtener los dispositivos.');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Error al obtener los dispositivos.');
     }
     const result = await response.json();
     return result.data;

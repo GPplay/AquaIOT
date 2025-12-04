@@ -47,11 +47,6 @@ export function SensorsTable({ onDevicesLoaded }: { onDevicesLoaded: (devices: S
             onDevicesLoaded(formattedData);
         } catch (err: any) {
             setError(err.message || "No se pudieron cargar los dispositivos.");
-            toast({
-                variant: "destructive",
-                title: "Error de Carga",
-                description: err.message,
-            });
         } finally {
             setLoading(false);
         }
