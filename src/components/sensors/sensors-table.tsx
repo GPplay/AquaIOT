@@ -7,8 +7,11 @@ import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuIte
 import { Button } from "../ui/button";
 import { MoreHorizontal, Trash2, Edit, Wifi, WifiOff } from "lucide-react";
 import { useState } from "react";
+import { EditSensorDialog } from "./edit-sensor-dialog";
 
-const initialSensors = [
+type Sensor = { name: string; area: string; macAddress: string; status: 'online' | 'offline' };
+
+const initialSensors: Sensor[] = [
   { name: 'Dispositivo Boca del Río', area: 'Barrio Chino', macAddress: '3C:71:BF:4C:4C:AC', status: 'online' },
   { name: 'Dispositivo Canal Getsemaní', area: 'Getsemaní', macAddress: '84:0D:8E:95:5E:28', status: 'online' },
   { name: 'Muelle Bocagrande', area: 'Bocagrande', macAddress: 'A0:20:A6:10:4E:5A', status: 'offline' },
@@ -23,10 +26,14 @@ const statusConfig: { [key: string]: { variant: 'default' | 'secondary' | 'destr
 };
 
 export function SensorsTable() {
-    const [sensors, setSensors] = useState(initialSensors);
+    const [sensors, setSensors] = useState<Sensor[]>(initialSensors);
 
     const handleDelete = (macAddress: string) => {
         setSensors(sensors.filter(sensor => sensor.macAddress !== macAddress));
+    }
+
+    const handleUpdate = (updatedSensor: Sensor) => {
+        setSensors(sensors.map(sensor => sensor.macAddress === updatedSensor.macAddress ? updatedSensor : sensor));
     }
 
   return (
@@ -67,10 +74,12 @@ export function SensorsTable() {
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                            <DropdownMenuItem>
-                                <Edit className="mr-2" />
-                                Editar
-                            </DropdownMenuItem>
+                            <EditSensorDialog sensor={sensor} onUpdate={handleUpdate}>
+                                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                                    <Edit className="mr-2" />
+                                    Editar
+                                </DropdownMenuItem>
+                            </EditSensorDialog>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem className="text-destructive" onClick={() => handleDelete(sensor.macAddress)}>
                                 <Trash2 className="mr-2" />
