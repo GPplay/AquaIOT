@@ -6,9 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from "../ui/dropdown-menu";
 import { Button } from "../ui/button";
 import { MoreHorizontal, Trash2, Edit, Wifi, WifiOff, AlertTriangle } from "lucide-react";
-import { useState, useEffect, useCallback } from "react";
 import { EditSensorDialog } from "./edit-sensor-dialog";
-import { getDevices, deleteDevice } from "@/services/api";
+import { deleteDevice } from "@/services/api";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "../ui/skeleton";
 import {
@@ -21,44 +20,17 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
-
-type Sensor = { name: string; address: string; macAddress: string; status: 'online' | 'offline' };
+} from "@/components/ui/alert-dialog";
+import { useDevices } from "@/hooks/use-devices";
 
 const statusConfig: { [key: string]: { variant: 'default' | 'secondary' | 'destructive' | 'outline' | null | undefined, icon: React.ReactNode, label: string } } = {
   online: { variant: 'default', icon: <Wifi className="h-3 w-3" />, label: 'En línea' },
   offline: { variant: 'destructive', icon: <WifiOff className="h-3 w-3" />, label: 'Fuera de línea' },
 };
 
-export function SensorsTable({ onDevicesLoaded }: { onDevicesLoaded: (devices: Sensor[]) => void }) {
-    const [sensors, setSensors] = useState<Sensor[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+export function SensorsTable() {
+    const { devices, loading, error, refreshDevices } = useDevices();
     const { toast } = useToast();
-
-    const fetchDevices = useCallback(async () => {
-        setLoading(true);
-        setError(null);
-        try {
-            const data = await getDevices();
-            const formattedData: Sensor[] = data.map((d: any) => ({ 
-                macAddress: d.id, 
-                name: d.name,
-                address: d.address,
-                status: d.status === 'ON' ? 'online' : 'offline'
-            }));
-            setSensors(formattedData);
-            onDevicesLoaded(formattedData);
-        } catch (err: any) {
-            setError(err.message || "No se pudieron cargar los dispositivos.");
-        } finally {
-            setLoading(false);
-        }
-    }, [onDevicesLoaded]);
-
-    useEffect(() => {
-        fetchDevices();
-    }, [fetchDevices]);
 
     const handleDelete = async (macAddress: string) => {
         try {
@@ -67,7 +39,7 @@ export function SensorsTable({ onDevicesLoaded }: { onDevicesLoaded: (devices: S
                 title: "Dispositivo Eliminado",
                 description: `El dispositivo con MAC ${macAddress} ha sido eliminado.`,
             });
-            fetchDevices(); // Refresh list
+            refreshDevices(); // Refresh list
         } catch (err: any) {
             toast({
                 variant: "destructive",
@@ -116,14 +88,14 @@ export function SensorsTable({ onDevicesLoaded }: { onDevicesLoaded: (devices: S
                     </div>
                   </TableCell>
                 </TableRow>
-              ) : sensors.length === 0 ? (
+              ) : devices.length === 0 ? (
                 <TableRow>
                     <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
                         No se han encontrado dispositivos. Añade uno para empezar.
                     </TableCell>
                 </TableRow>
               ) : (
-                sensors.map((sensor) => (
+                devices.map((sensor) => (
                     <TableRow key={sensor.macAddress}>
                     <TableCell className="font-mono text-xs">{sensor.macAddress}</TableCell>
                     <TableCell className="font-medium">{sensor.name}</TableCell>
@@ -143,7 +115,7 @@ export function SensorsTable({ onDevicesLoaded }: { onDevicesLoaded: (devices: S
                                     </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
-                                    <EditSensorDialog sensor={sensor} onUpdate={fetchDevices}>
+                                    <EditSensorDialog sensor={sensor} onUpdate={refreshDevices}>
                                         <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
                                             <Edit className="mr-2" />
                                             Editar

@@ -8,8 +8,9 @@ import Link from "next/link";
 import { usePathname } from 'next/navigation';
 import { AlertsProvider, useAlerts } from "@/hooks/use-alerts.tsx";
 import { Badge } from "@/components/ui/badge";
+import { DevicesProvider } from "@/hooks/use-devices";
 
-function LayoutWithAlerts({ children }: { children: React.ReactNode }) {
+function LayoutWithProviders({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { unreadCount } = useAlerts();
 
@@ -82,7 +83,9 @@ export default function DashboardLayout({
 }) {
     return (
         <AlertsProvider>
-            <LayoutWithAlerts>{children}</LayoutWithAlerts>
+            <DevicesProvider>
+                <LayoutWithProviders>{children}</LayoutWithProviders>
+            </DevicesProvider>
         </AlertsProvider>
     )
 }

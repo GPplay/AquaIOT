@@ -5,124 +5,20 @@ import { RealtimeChart } from "@/components/dashboard/realtime-chart";
 import { AlertsTable } from "@/components/dashboard/alerts-table";
 import { Waves, Thermometer, Gauge, Wifi } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useState, useEffect, useMemo, useCallback } from "react";
-import { connectToMqtt, type DeviceData } from "@/services/mqtt";
-import { type MqttClient } from "mqtt";
-import { getDevices } from "@/services/api";
 import { Skeleton } from "@/components/ui/skeleton";
-
-type Device = {
-  id: string; // This is the macAddress
-  name: string;
-  macAddress: string;
-};
-
-type DeviceMetrics = {
-    waterLevel: number;
-    temperature: number;
-    pressure: number;
-};
-
-type DeviceState = {
-    currentMetrics: DeviceMetrics;
-    realtimeData: (DeviceMetrics & { time: string })[];
-};
-
-const initialDeviceState: DeviceState = {
-    currentMetrics: { waterLevel: 0, temperature: 0, pressure: 0 },
-    realtimeData: [],
-};
-
-const useMqttData = (devices: Device[]) => {
-    const [data, setData] = useState<Record<string, DeviceState>>(() => {
-        const initialState: Record<string, DeviceState> = {};
-        devices.forEach(device => {
-            initialState[device.macAddress] = { ...initialDeviceState };
-        });
-        return initialState;
-    });
-
-    useEffect(() => {
-        const userId = localStorage.getItem('userId');
-        if (!userId || devices.length === 0) {
-            return;
-        }
-
-        const handleNewData = (_topic: string, message: DeviceData) => {
-            const deviceId = message.device_id;
-            
-            if (devices.some(d => d.macAddress === deviceId)) {
-                setData(prevData => {
-                    const deviceState = prevData[deviceId] || { ...initialDeviceState };
-                    const newPoint = {
-                        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
-                        waterLevel: message.level,
-                        temperature: message.temp,
-                        pressure: message.atm,
-                    };
-                    const newRealtimeData = [...deviceState.realtimeData, newPoint].slice(-20);
-
-                    return {
-                        ...prevData,
-                        [deviceId]: {
-                            ...deviceState,
-                            currentMetrics: {
-                                waterLevel: newPoint.waterLevel,
-                                temperature: newPoint.temperature,
-                                pressure: newPoint.pressure,
-                            },
-                            realtimeData: newRealtimeData,
-                        },
-                    };
-                });
-            }
-        };
-
-        const mqttClient: MqttClient = connectToMqtt(userId, handleNewData);
-
-        return () => {
-            if (mqttClient) {
-                mqttClient.end();
-            }
-        };
-    }, [devices]);
-
-    return data;
-};
+import { useDevices } from "@/hooks/use-devices";
 
 export default function DashboardPage() {
-  const [deviceList, setDeviceList] = useState<Device[]>([]);
-  const [loadingDevices, setLoadingDevices] = useState(true);
-  const [selectedDeviceId, setSelectedDeviceId] = useState<string | undefined>(undefined);
+  const { 
+    devices, 
+    loading, 
+    selectedDevice, 
+    setSelectedDeviceId,
+    deviceData,
+  } = useDevices();
 
-  const fetchDevices = useCallback(async () => {
-    try {
-        const devicesFromApi = await getDevices();
-        const formattedDevices: Device[] = devicesFromApi.map((d: any) => ({
-          id: d.id, // The API returns 'id' as the mac address
-          name: d.name,
-          macAddress: d.id,
-        }));
-        setDeviceList(formattedDevices);
-        if (formattedDevices.length > 0 && !selectedDeviceId) {
-            setSelectedDeviceId(formattedDevices[0].macAddress);
-        }
-    } catch (error) {
-        console.error("Failed to fetch devices", error);
-    } finally {
-        setLoadingDevices(false);
-    }
-  }, [selectedDeviceId]);
-
-  useEffect(() => {
-    fetchDevices();
-  }, [fetchDevices]);
-
-  const allDevicesData = useMqttData(deviceList);
-  const deviceData = (selectedDeviceId && allDevicesData[selectedDeviceId]) || initialDeviceState;
+  const currentDeviceData = deviceData[selectedDevice?.macAddress || ''] || { currentMetrics: { waterLevel: 0, temperature: 0, pressure: 0 }, realtimeData: [] };
   
-  const selectedDevice = useMemo(() => deviceList.find(d => d.macAddress === selectedDeviceId), [selectedDeviceId, deviceList]);
-
   return (
     <div className="flex flex-col gap-6">
        <div className="flex items-center justify-between">
@@ -132,10 +28,10 @@ export default function DashboardPage() {
         </div>
         <div className="flex flex-col items-end gap-2">
             <div className="w-full max-w-xs">
-                {loadingDevices ? (
+                {loading ? (
                     <Skeleton className="h-10 w-full" />
                 ) : (
-                    <Select value={selectedDeviceId} onValueChange={setSelectedDeviceId} disabled={deviceList.length === 0}>
+                    <Select value={selectedDevice?.macAddress} onValueChange={setSelectedDeviceId} disabled={devices.length === 0}>
                         <SelectTrigger className="w-full">
                             <div className="flex items-center gap-2">
                                 <Wifi className="h-4 w-4"/>
@@ -143,8 +39,8 @@ export default function DashboardPage() {
                             </div>
                         </SelectTrigger>
                         <SelectContent>
-                            {deviceList.map(device => (
-                                <SelectItem key={device.id} value={device.macAddress}>{device.name}</SelectItem>
+                            {devices.map(device => (
+                                <SelectItem key={device.macAddress} value={device.macAddress}>{device.name}</SelectItem>
                             ))}
                         </SelectContent>
                     </Select>
@@ -158,12 +54,12 @@ export default function DashboardPage() {
         </div>
       </div>
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-        <MetricCard title="Nivel del Agua" value={`${deviceData.currentMetrics.waterLevel.toFixed(2)}m`} icon={<Waves className="h-5 w-5"/>} />
-        <MetricCard title="Temperatura" value={`${deviceData.currentMetrics.temperature.toFixed(1)}°C`} icon={<Thermometer className="h-5 w-5"/>} />
-        <MetricCard title="Presión Atmosférica" value={`${deviceData.currentMetrics.pressure.toFixed(0)} hPa`} icon={<Gauge className="h-5 w-5"/>} />
+        <MetricCard title="Nivel del Agua" value={`${currentDeviceData.currentMetrics.waterLevel.toFixed(2)}m`} icon={<Waves className="h-5 w-5"/>} />
+        <MetricCard title="Temperatura" value={`${currentDeviceData.currentMetrics.temperature.toFixed(1)}°C`} icon={<Thermometer className="h-5 w-5"/>} />
+        <MetricCard title="Presión Atmosférica" value={`${currentDeviceData.currentMetrics.pressure.toFixed(0)} hPa`} icon={<Gauge className="h-5 w-5"/>} />
       </div>
       <div className="grid grid-cols-1 gap-6">
-        <RealtimeChart data={deviceData.realtimeData} />
+        <RealtimeChart data={currentDeviceData.realtimeData} />
       </div>
       <div>
         <AlertsTable 
