@@ -31,7 +31,7 @@ interface DevicesContextType {
   loading: boolean;
   error: string | null;
   selectedDevice: Device | undefined;
-  setSelectedDeviceId: (id: string) => void;
+  setSelectedDeviceId: (id: string | undefined) => void;
   deviceData: Record<string, DeviceState>;
   refreshDevices: () => void;
 }
@@ -52,8 +52,8 @@ export function DevicesProvider({ children }: { children: ReactNode }) {
   const { refreshAlerts } = useAlerts();
 
   const refreshDevices = useCallback(async () => {
+    setLoading(true);
     try {
-      setLoading(true);
       setError(null);
       const devicesFromApi = await getDevices();
       
@@ -69,34 +69,40 @@ export function DevicesProvider({ children }: { children: ReactNode }) {
         macAddress: d.id,
         name: d.name,
         address: d.address,
-        status: d.status === 'ON' ? 'online' : 'offline',
+        status: 'offline', // Start as offline until a message is received
       }));
 
       setDevices(formattedDevices);
 
-      if (formattedDevices.length > 0 && !selectedDeviceId) {
-        setSelectedDeviceIdState(formattedDevices[0].macAddress);
-      }
-      
-      // Initialize states
+      // Initialize states for new devices
       setDeviceData(prev => {
-        const newState: Record<string, DeviceState> = {};
+        const newState: Record<string, DeviceState> = {...prev};
         for (const device of formattedDevices) {
-            newState[device.macAddress] = prev[device.macAddress] || {
-                currentMetrics: { waterLevel: 0, temperature: 0, pressure: 0 },
-                realtimeData: [],
-            };
+            if (!newState[device.macAddress]) {
+                newState[device.macAddress] = {
+                    currentMetrics: { waterLevel: 0, temperature: 0, pressure: 0 },
+                    realtimeData: [],
+                };
+            }
         }
         return newState;
       });
 
+      // Set initial timestamps
       setLastMessageTimestamps(prev => {
-        const newTimestamps: Record<string, number> = {};
+        const newTimestamps: Record<string, number> = {...prev};
         for (const device of formattedDevices) {
-            newTimestamps[device.macAddress] = prev[device.macAddress] || Date.now();
+           if (!newTimestamps[device.macAddress]) {
+             newTimestamps[device.macAddress] = 0; // Set to 0 to be considered offline initially
+           }
         }
         return newTimestamps;
       });
+      
+      // Select the first device if none is selected
+      if (!selectedDeviceId && formattedDevices.length > 0) {
+        setSelectedDeviceIdState(formattedDevices[0].macAddress);
+      }
 
 
     } catch (err: any) {
@@ -107,61 +113,66 @@ export function DevicesProvider({ children }: { children: ReactNode }) {
     }
   }, [selectedDeviceId]);
 
+  // Initial fetch of devices
   useEffect(() => {
     refreshDevices();
-  }, [refreshDevices]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  // MQTT connection
+  // MQTT connection and message handling
   useEffect(() => {
     const userId = localStorage.getItem('userId');
     if (!userId) return;
 
-    const handleNewMqttMessage = async (_topic: string, message: MqttMessage) => {
+    const handleNewMqttMessage = async (topic: string, message: MqttMessage) => {
         const deviceId = message.device_id;
         
+        // Ensure the device from MQTT exists in our list
+        if (!devices.some(d => d.macAddress === deviceId)) return;
+        
+        // Handle incoming data packets
         if (message.event === 'data' && typeof message.level === 'number' && typeof message.temp === 'number' && typeof message.atm === 'number') {
-            setDevices(prevDevices => prevDevices.map(d => d.macAddress === deviceId ? { ...d, status: 'online' } : d));
-            setLastMessageTimestamps(prev => ({...prev, [deviceId]: Date.now()}));
+            setLastMessageTimestamps(prev => ({ ...prev, [deviceId]: Date.now() }));
             
             setDeviceData(prevData => {
                 const deviceState = prevData[deviceId] || { currentMetrics: { waterLevel: 0, temperature: 0, pressure: 0 }, realtimeData: [] };
-                const newPoint = {
-                    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
-                    waterLevel: message.level as number,
-                    temperature: message.temp as number,
-                    pressure: message.atm as number,
+                
+                const newMetrics: DeviceMetrics = {
+                    waterLevel: message.level,
+                    temperature: message.temp,
+                    pressure: message.atm,
                 };
+                
+                const newPoint = {
+                    ...newMetrics,
+                    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+                };
+
                 const newRealtimeData = [...deviceState.realtimeData, newPoint].slice(-20);
 
                 return {
                     ...prevData,
                     [deviceId]: {
-                        ...deviceState,
-                        currentMetrics: {
-                            waterLevel: newPoint.waterLevel,
-                            temperature: newPoint.temperature,
-                            pressure: newPoint.pressure,
-                        },
+                        currentMetrics: newMetrics,
                         realtimeData: newRealtimeData,
                     },
                 };
             });
-        } else if (message.event === 'alert') {
+        } 
+        // Handle incoming alert events
+        else if (message.event === 'alert') {
             const { level, data, device_id } = message;
 
             if ((level === 'HIGH' || level === 'MEDIUM' || level === 'LOW') && data && device_id) {
                 try {
-                    // Register alert in backend
                     await addAlert({ device_id, level, description: data });
                     
-                    // Show toast notification
                     toast({
                         title: `Nueva Alerta de Riesgo: ${level}`,
                         description: `Dispositivo ${device_id}: ${data}`,
                         variant: level === 'HIGH' ? 'destructive' : 'default',
                     });
-
-                    // Refresh alerts list
+                    
                     refreshAlerts();
 
                 } catch (error: any) {
@@ -183,22 +194,28 @@ export function DevicesProvider({ children }: { children: ReactNode }) {
             mqttClient.end();
         }
     };
-  }, [toast, refreshAlerts]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [toast, refreshAlerts, devices]);
 
   // Offline status checker
   useEffect(() => {
     const intervalId = setInterval(() => {
       const now = Date.now();
-      const updatedDevices = devices.map(device => {
-        const lastMessageTime = lastMessageTimestamps[device.macAddress];
-        const isOffline = lastMessageTime ? (now - lastMessageTime > OFFLINE_TIMEOUT) : true;
-        return { ...device, status: isOffline ? 'offline' : 'online' };
-      });
-      setDevices(updatedDevices);
+      setDevices(prevDevices => 
+        prevDevices.map(device => {
+            const lastMessageTime = lastMessageTimestamps[device.macAddress] || 0;
+            const isOffline = (now - lastMessageTime > OFFLINE_TIMEOUT);
+            const newStatus = isOffline ? 'offline' : 'online';
+            if (device.status !== newStatus) {
+                return { ...device, status: newStatus };
+            }
+            return device;
+        })
+      );
     }, 5000); // Check every 5 seconds
 
     return () => clearInterval(intervalId);
-  }, [devices, lastMessageTimestamps]);
+  }, [lastMessageTimestamps]);
 
 
   const selectedDevice = useMemo(() => devices.find(d => d.macAddress === selectedDeviceId), [devices, selectedDeviceId]);

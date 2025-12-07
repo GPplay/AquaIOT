@@ -34,6 +34,7 @@ export function RealtimeChart({ data }: { data: any[] }) {
               <XAxis dataKey="time" tickLine={false} axisLine={false} tickMargin={8} fontSize={12} />
               <YAxis yAxisId="left" stroke="hsl(var(--chart-1))" tickLine={false} axisLine={false} tickMargin={8} fontSize={12} />
               <YAxis yAxisId="right" orientation="right" stroke="hsl(var(--chart-2))" tickLine={false} axisLine={false} tickMargin={8} fontSize={12} />
+               <YAxis yAxisId="pressure" orientation="right" stroke="hsl(var(--chart-3))" tickLine={false} axisLine={false} tickMargin={8} fontSize={12} domain={['dataMin - 10', 'dataMax + 10']} hide={true} />
               <ChartTooltip
                 cursor={false}
                 content={<ChartTooltipContent indicator="line" />}
@@ -58,7 +59,7 @@ export function RealtimeChart({ data }: { data: any[] }) {
                 dot={false}
               />
                <Line
-                yAxisId="right"
+                yAxisId="pressure"
                 type="monotone"
                 dataKey="pressure"
                 name="Presión (hPa)"
