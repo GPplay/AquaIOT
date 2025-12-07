@@ -128,12 +128,19 @@ export function DevicesProvider({ children }: { children: ReactNode }) {
         const deviceId = message.device_id;
         
         // Ensure the device from MQTT exists in our list
-        if (!devices.some(d => d.macAddress === deviceId)) return;
+        const deviceExists = devices.some(d => d.macAddress === deviceId);
+        if (!deviceExists) return;
+
+        setLastMessageTimestamps(prev => ({ ...prev, [deviceId]: Date.now() }));
+        
+        setDevices(prevDevices => 
+            prevDevices.map(device => 
+                device.macAddress === deviceId ? { ...device, status: 'online' } : device
+            )
+        );
         
         // Handle incoming data packets
         if (message.event === 'data' && typeof message.level === 'number' && typeof message.temp === 'number' && typeof message.atm === 'number') {
-            setLastMessageTimestamps(prev => ({ ...prev, [deviceId]: Date.now() }));
-            
             setDeviceData(prevData => {
                 const deviceState = prevData[deviceId] || { currentMetrics: { waterLevel: 0, temperature: 0, pressure: 0 }, realtimeData: [] };
                 
@@ -204,10 +211,11 @@ export function DevicesProvider({ children }: { children: ReactNode }) {
       setDevices(prevDevices => 
         prevDevices.map(device => {
             const lastMessageTime = lastMessageTimestamps[device.macAddress] || 0;
-            const isOffline = (now - lastMessageTime > OFFLINE_TIMEOUT);
-            const newStatus = isOffline ? 'offline' : 'online';
-            if (device.status !== newStatus) {
-                return { ...device, status: newStatus };
+            const isOffline = (now - lastMessageTime > OFFLINE_TIMEOUT) && lastMessageTime !== 0;
+            const newStatus = isOffline ? 'offline' : device.status;
+
+            if (device.status !== newStatus && lastMessageTime !== 0) {
+                 return { ...device, status: newStatus };
             }
             return device;
         })
