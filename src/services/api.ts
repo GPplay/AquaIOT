@@ -103,6 +103,30 @@ export async function getAlerts(): Promise<Alert[]> {
   return result.data;
 }
 
+/**
+ * Registers a new alert in the backend.
+ * @param alertData The data for the new alert.
+ * @returns A promise that resolves to the created alert.
+ */
+export async function addAlert(alertData: { device_id: string; level: 'HIGH' | 'MEDIUM' | 'LOW'; description: string; }) {
+  const token = await getAuthToken();
+  const response = await fetch(`${API_BASE_URL}/alert`, {
+    method: 'POST',
+    headers: {
+      'accept': 'application/json',
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(alertData),
+  });
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.message || 'Error al registrar la alerta.');
+  }
+  const result = await response.json();
+  return result.data;
+}
+
 
 /**
  * Marks an alert as checked.

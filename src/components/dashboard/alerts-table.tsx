@@ -1,13 +1,12 @@
 'use client';
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AlertTriangle, CheckCircle2 } from "lucide-react";
 import { checkAlert } from "@/services/api";
-import { type Alert } from "@/lib/types";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { Button } from "../ui/button";
@@ -76,7 +75,7 @@ export function AlertsTable({ filterByDeviceId, title = "Alertas Recientes", des
                 <TableHead>ID de Alerta</TableHead>
                 <TableHead>Nivel de Riesgo</TableHead>
                 <TableHead>Dispositivo</TableHead>
-                <TableHead>Área Afectada</TableHead>
+                <TableHead>Descripción</TableHead>
                 <TableHead>Fecha y Hora</TableHead>
                 <TableHead className="text-right">Estado</TableHead>
               </TableRow>
@@ -117,7 +116,7 @@ export function AlertsTable({ filterByDeviceId, title = "Alertas Recientes", des
                       <Badge variant={riskVariants[alert.level]} className="capitalize">{alert.level.toLowerCase()}</Badge>
                     </TableCell>
                     <TableCell className="font-mono text-xs">{alert.device_id}</TableCell>
-                    <TableCell>{alert.address}</TableCell>
+                    <TableCell>{alert.description}</TableCell>
                     <TableCell>{format(new Date(alert.date), "d 'de' MMMM, yyyy 'a las' HH:mm", { locale: es })}</TableCell>
                     <TableCell className="text-right">
                       {alert.checked ? (

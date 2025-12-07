@@ -8,12 +8,15 @@ import { MQTT_BROKER_URL } from '@/config';
 /**
  * Representa los datos que se esperan de un dispositivo ESP.
  */
-export interface DeviceData {
+export interface MqttMessage {
   device_id: string;
-  level: number;
-  temp: number;
-  atm: number;
+  event: 'data' | 'alert';
+  level: number | 'HIGH' | 'MEDIUM' | 'LOW';
+  temp?: number;
+  atm?: number;
+  data?: string; // For alert descriptions
 }
+
 
 /**
  * Función para conectar al broker MQTT y suscribirse a los topics dinámicos del usuario.
@@ -22,7 +25,7 @@ export interface DeviceData {
  * @param onMessageCallback - Una función que se llamará cada vez que se reciba un mensaje.
  *                            Toma el topic y el payload (como objeto DeviceData) como argumentos.
  */
-export function connectToMqtt(userId: string, onMessageCallback: (topic: string, data: DeviceData) => void) {
+export function connectToMqtt(userId: string, onMessageCallback: (topic: string, data: MqttMessage) => void) {
   console.log(`Intentando conectar al broker MQTT en ${MQTT_BROKER_URL}...`);
 
   const client = mqtt.connect(MQTT_BROKER_URL);
@@ -45,7 +48,7 @@ export function connectToMqtt(userId: string, onMessageCallback: (topic: string,
     try {
       // El payload llega como un Buffer, así que lo convertimos a string y luego a JSON.
       const messageString = payload.toString();
-      const data: DeviceData = JSON.parse(messageString);
+      const data: MqttMessage = JSON.parse(messageString);
       
       console.log(`Mensaje recibido en el topic [${topic}]:`, data);
 

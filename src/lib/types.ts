@@ -7,4 +7,5 @@ export type Alert = {
   level: 'HIGH' | 'MEDIUM' | 'LOW';
   date: string;
   device_id: string;
+  description: string;
 };
