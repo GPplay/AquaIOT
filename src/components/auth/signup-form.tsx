@@ -11,6 +11,7 @@ import { useState, useMemo } from 'react';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { useToast } from '@/hooks/use-toast';
+import { API_BASE_URL } from '@/config';
 
 const formSchema = z.object({
   name: z.string().min(2, 'El nombre debe tener al menos 2 caracteres.'),
@@ -84,7 +85,7 @@ export function SignupForm() {
     setLoading(true);
     
     try {
-      const response = await fetch("http://localhost:9001/user/register", {
+      const response = await fetch(`${API_BASE_URL}/user/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
