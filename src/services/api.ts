@@ -2,8 +2,7 @@
 // This file is intended to house all the backend API communication logic.
 
 import type { Alert } from "@/lib/types";
-
-const API_BASE_URL = 'http://localhost:9001';
+import { API_BASE_URL } from '@/config';
 
 /**
  * Decodes a JWT token to extract its payload.
@@ -80,13 +79,20 @@ export async function getAlerts(): Promise<Alert[]> {
     return [];
   }
 
-  const response = await fetch(`${API_BASE_URL}/alert/`, {
-    method: 'GET',
-    headers: {
-      'accept': 'application/json',
-      'Authorization': `Bearer ${token}`, // Assumes token is stored with "Bearer " prefix
-    },
-  });
+  let response;
+  try {
+    response = await fetch(`${API_BASE_URL}/alert/`, {
+      method: 'GET',
+      headers: {
+        'accept': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+  } catch (error) {
+    console.error("Connection error fetching alerts:", error);
+    throw new Error("No se pudo conectar con el servidor para obtener las alertas.");
+  }
+
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({ message: 'Error al cargar las alertas.' }));

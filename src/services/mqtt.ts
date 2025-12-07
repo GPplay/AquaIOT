@@ -3,9 +3,7 @@
 // Este archivo está destinado a configurar y gestionar la conexión del cliente MQTT.
 
 import mqtt from 'mqtt';
-
-// Configure los detalles de su broker MQTT
-const MQTT_BROKER_URL = 'ws://localhost:9003'; // Conexión a través de WebSocket
+import { MQTT_BROKER_URL } from '@/config';
 
 /**
  * Representa los datos que se esperan de un dispositivo ESP.
