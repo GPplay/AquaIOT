@@ -4,7 +4,7 @@
  */
 
 // API Configuration
-export const API_BASE_URL = 'http://localhost:9001';
+export const API_BASE_URL = 'http://10.139.170.197:9001';
 
 // MQTT Configuration
-export const MQTT_BROKER_URL = 'ws://localhost:9003'; // WebSocket connection
+export const MQTT_BROKER_URL = 'ws://10.139.170.197:9003'; // WebSocket connection
