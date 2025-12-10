@@ -54,7 +54,7 @@ export default function DashboardPage() {
         </div>
       </div>
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-        <MetricCard title="Nivel del Agua" value={`${currentDeviceData.currentMetrics.waterLevel.toFixed(2)}m`} icon={<Waves className="h-5 w-5"/>} />
+        <MetricCard title="Nivel del Agua" value={`${currentDeviceData.currentMetrics.waterLevel.toFixed(2)} cm`} icon={<Waves className="h-5 w-5"/>} />
         <MetricCard title="Temperatura" value={`${currentDeviceData.currentMetrics.temperature.toFixed(1)}°C`} icon={<Thermometer className="h-5 w-5"/>} />
         <MetricCard title="Presión Atmosférica" value={`${currentDeviceData.currentMetrics.pressure.toFixed(0)} hPa`} icon={<Gauge className="h-5 w-5"/>} />
       </div>
