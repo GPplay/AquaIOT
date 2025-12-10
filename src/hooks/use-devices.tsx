@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, useMemo, useCallback, type ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, useMemo, useCallback, type ReactNode, useRef } from 'react';
 import { getDevices, addAlert } from '@/services/api';
 import { connectToMqtt, type MqttMessage } from '@/services/mqtt';
 import type { MqttClient } from 'mqtt';
@@ -24,6 +24,7 @@ type DeviceMetrics = {
 type DeviceState = {
     currentMetrics: DeviceMetrics;
     realtimeData: (DeviceMetrics & { time: string })[];
+    relayStatus: 'ON' | 'OFF';
 };
 
 interface DevicesContextType {
@@ -34,6 +35,7 @@ interface DevicesContextType {
   setSelectedDeviceId: (id: string | undefined) => void;
   deviceData: Record<string, DeviceState>;
   refreshDevices: () => void;
+  sendCommand: (command: 'ON' | 'OFF') => void;
 }
 
 const DevicesContext = createContext<DevicesContextType | undefined>(undefined);
@@ -50,6 +52,7 @@ export function DevicesProvider({ children }: { children: ReactNode }) {
   const [deviceData, setDeviceData] = useState<Record<string, DeviceState>>({});
   const { toast } = useToast();
   const { refreshAlerts } = useAlerts();
+  const mqttClientRef = useRef<MqttClient | null>(null);
 
   const refreshDevices = useCallback(async () => {
     setLoading(true);
@@ -82,6 +85,7 @@ export function DevicesProvider({ children }: { children: ReactNode }) {
                 newState[device.macAddress] = {
                     currentMetrics: { waterLevel: 0, temperature: 0, pressure: 0 },
                     realtimeData: [],
+                    relayStatus: 'OFF',
                 };
             }
         }
@@ -130,7 +134,7 @@ export function DevicesProvider({ children }: { children: ReactNode }) {
         // Ensure the device from MQTT exists in our list
         const deviceExists = devices.some(d => d.macAddress === deviceId);
         if (!deviceExists) return;
-
+        
         setLastMessageTimestamps(prev => ({ ...prev, [deviceId]: Date.now() }));
         
         setDevices(prevDevices => 
@@ -142,7 +146,7 @@ export function DevicesProvider({ children }: { children: ReactNode }) {
         // Handle incoming data packets
         if (message.event === 'data' && typeof message.level === 'number' && typeof message.temp === 'number' && typeof message.atm === 'number') {
             setDeviceData(prevData => {
-                const deviceState = prevData[deviceId] || { currentMetrics: { waterLevel: 0, temperature: 0, pressure: 0 }, realtimeData: [] };
+                const deviceState = prevData[deviceId] || { currentMetrics: { waterLevel: 0, temperature: 0, pressure: 0 }, realtimeData: [], relayStatus: 'OFF' };
                 
                 const newMetrics: DeviceMetrics = {
                     waterLevel: message.level,
@@ -160,6 +164,7 @@ export function DevicesProvider({ children }: { children: ReactNode }) {
                 return {
                     ...prevData,
                     [deviceId]: {
+                        ...deviceState,
                         currentMetrics: newMetrics,
                         realtimeData: newRealtimeData,
                     },
@@ -194,11 +199,14 @@ export function DevicesProvider({ children }: { children: ReactNode }) {
         }
     };
 
-    const mqttClient: MqttClient = connectToMqtt(userId, handleNewMqttMessage);
-
+    if (!mqttClientRef.current) {
+        mqttClientRef.current = connectToMqtt(userId, handleNewMqttMessage);
+    }
+    
     return () => {
-        if (mqttClient) {
-            mqttClient.end();
+        if (mqttClientRef.current && mqttClientRef.current.connected) {
+            mqttClientRef.current.end();
+            mqttClientRef.current = null;
         }
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -211,10 +219,12 @@ export function DevicesProvider({ children }: { children: ReactNode }) {
       setDevices(prevDevices => 
         prevDevices.map(device => {
             const lastMessageTime = lastMessageTimestamps[device.macAddress] || 0;
-            const isOffline = (now - lastMessageTime > OFFLINE_TIMEOUT) && lastMessageTime !== 0;
-            const newStatus = isOffline ? 'offline' : device.status;
+            if (lastMessageTime === 0) return device; // Don't check devices that have never sent a message
 
-            if (device.status !== newStatus && lastMessageTime !== 0) {
+            const isOffline = now - lastMessageTime > OFFLINE_TIMEOUT;
+            const newStatus = isOffline ? 'offline' : 'online';
+
+            if (device.status !== newStatus) {
                  return { ...device, status: newStatus };
             }
             return device;
@@ -224,6 +234,36 @@ export function DevicesProvider({ children }: { children: ReactNode }) {
 
     return () => clearInterval(intervalId);
   }, [lastMessageTimestamps]);
+
+
+  const sendCommand = useCallback((command: 'ON' | 'OFF') => {
+    const userId = localStorage.getItem('userId');
+    if (!mqttClientRef.current || !selectedDeviceId || !userId) return;
+
+    const topic = `${userId}/esp/${selectedDeviceId}/command`;
+    const payload = JSON.stringify({ relay: command });
+
+    mqttClientRef.current.publish(topic, payload, (error) => {
+        if (error) {
+            console.error('Failed to publish command:', error);
+            toast({
+                title: "Error de Comando",
+                description: "No se pudo enviar el comando al dispositivo.",
+                variant: "destructive",
+            });
+        } else {
+            console.log(`Command '${payload}' published to '${topic}'`);
+            // Optimistically update UI
+            setDeviceData(prev => ({
+                ...prev,
+                [selectedDeviceId]: {
+                    ...prev[selectedDeviceId],
+                    relayStatus: command,
+                }
+            }));
+        }
+    });
+  }, [selectedDeviceId, toast]);
 
 
   const selectedDevice = useMemo(() => devices.find(d => d.macAddress === selectedDeviceId), [devices, selectedDeviceId]);
@@ -236,6 +276,7 @@ export function DevicesProvider({ children }: { children: ReactNode }) {
     setSelectedDeviceId: setSelectedDeviceIdState,
     deviceData,
     refreshDevices,
+    sendCommand,
   };
 
   return <DevicesContext.Provider value={value}>{children}</DevicesContext.Provider>;

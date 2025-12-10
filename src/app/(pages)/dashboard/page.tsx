@@ -7,6 +7,7 @@ import { Waves, Thermometer, Gauge, Wifi } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useDevices } from "@/hooks/use-devices";
+import { RelayControlCard } from "@/components/dashboard/relay-control-card";
 
 export default function DashboardPage() {
   const { 
@@ -17,7 +18,7 @@ export default function DashboardPage() {
     deviceData,
   } = useDevices();
 
-  const currentDeviceData = deviceData[selectedDevice?.macAddress || ''] || { currentMetrics: { waterLevel: 0, temperature: 0, pressure: 0 }, realtimeData: [] };
+  const currentDeviceData = deviceData[selectedDevice?.macAddress || ''] || { currentMetrics: { waterLevel: 0, temperature: 0, pressure: 0 }, realtimeData: [], relayStatus: 'OFF' };
   
   return (
     <div className="flex flex-col gap-6">
@@ -53,10 +54,11 @@ export default function DashboardPage() {
             )}
         </div>
       </div>
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
         <MetricCard title="Nivel del Agua" value={`${currentDeviceData.currentMetrics.waterLevel.toFixed(2)} %`} icon={<Waves className="h-5 w-5"/>} />
         <MetricCard title="Temperatura" value={`${currentDeviceData.currentMetrics.temperature.toFixed(1)}°C`} icon={<Thermometer className="h-5 w-5"/>} />
         <MetricCard title="Presión Atmosférica" value={`${currentDeviceData.currentMetrics.pressure.toFixed(0)} hPa`} icon={<Gauge className="h-5 w-5"/>} />
+        <RelayControlCard />
       </div>
       <div className="grid grid-cols-1 gap-6">
         <RealtimeChart data={currentDeviceData.realtimeData} />
