@@ -6,7 +6,7 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/
 
 const chartConfig = {
     waterLevel: {
-        label: 'Nivel Agua (cm)',
+        label: 'Nivel Agua (%)',
         color: 'hsl(var(--chart-1))',
     },
     temperature: {
@@ -44,7 +44,7 @@ export function RealtimeChart({ data }: { data: any[] }) {
                 yAxisId="left"
                 type="monotone"
                 dataKey="waterLevel"
-                name="Nivel Agua (cm)"
+                name="Nivel Agua (%)"
                 stroke="hsl(var(--chart-1))"
                 strokeWidth={2}
                 dot={false}
